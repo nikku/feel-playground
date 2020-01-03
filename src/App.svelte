@@ -137,7 +137,7 @@
 
   }
 
-  function updateStack(expression) {
+  function updateStack(expression, rawContext) {
 
     const stack = [
       {
@@ -150,7 +150,7 @@
     const {
       tree,
       context
-    } = Feelin.parseExpressions(expression);
+    } = Feelin.parseExpressions(expression, parseContext(rawContext));
 
     let txt = '';
 
@@ -190,7 +190,19 @@
     treeErrors = errors;
   }
 
-  $: expression !== undefined && updateStack(expression);
+  function parseContext(context) {
+    if (!context) {
+      return {};
+    }
+
+    try {
+      return JSON.parse(context);
+    } catch (e) {
+      return {};
+    }
+  }
+
+  $: expression !== undefined && updateStack(expression, context);
 
   $: highlightSelection(treeSelection);
 

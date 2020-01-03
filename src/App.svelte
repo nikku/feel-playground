@@ -310,7 +310,7 @@
   }
 
   .content {
-    font-size: 1.1em;
+    font-size: 1.3em;
     font-family: monospace;
 
     border: solid 1px #CCC;

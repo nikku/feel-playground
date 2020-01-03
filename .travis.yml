@@ -1,0 +1,12 @@
+language: node_js
+node_js: '10'
+
+script: npm run build
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  token: $GITHUB_TOKEN
+  local_dir: public
+  on:
+    branch: master

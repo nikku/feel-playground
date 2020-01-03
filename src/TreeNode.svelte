@@ -13,10 +13,10 @@
   }
 </script>
 
-<div class="node" class:error={ node.error } class:selected={ selection === node } on:mouseover={ handleSelect }>
+<div class="node" class:selected={ selection === node } on:mouseover={ handleSelect }>
 
   <div class="description">
-    { node.error ? 'ERROR' : node.name } [ { node.start }, { node.end } ]
+    <span class:error={ node.error } class="name">{ node.error ? 'ERROR' : node.name }</span> [ { node.start }, { node.end } ]
   </div>
 
   {#if node.children.length}
@@ -34,6 +34,15 @@
 </div>
 
 <style>
+
+  .node {
+    color: #444;
+  }
+
+  .name {
+    color: steelblue;
+  }
+
   .selected .description {
     background: bisque;
   }

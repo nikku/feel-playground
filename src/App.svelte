@@ -60,8 +60,6 @@
   }
 
   function serializeHash(expression, context, syntaxHighlight) {
-    console.log(syntaxHighlight);
-
     window.location.hash = '#' + [ expression, context, syntaxHighlight ].map(encodeURIComponent).join(';');
   }
 

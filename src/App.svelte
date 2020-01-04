@@ -28,11 +28,14 @@
   let syntaxMarks = [];
   let selectionMark;
 
-  let syntaxHighlight = params.syntaxHighlight === 'true';
+  let syntaxHighlight = params.syntaxHighlight !== 'false';
 
   let expression = params.expression || 'for fruit in [ "apple", "bananas" ], vegetable in vegetables return makeSalat(fruit, vegetable)';
 
-  let context = params.context || '{}';
+  let context;
+
+  let contextString = params.contextString || '{}';
+  let contextParseError;
 
   onMount(() => {
     editor = CodeMirror.fromTextArea(editorElement, {
@@ -50,17 +53,17 @@
 
     const hash = window.location.hash;
 
-    const [ expression, context, syntaxHighlight ] = hash.slice(1).split(';').map(decodeURIComponent);
+    const [ expression, contextString, syntaxHighlight ] = hash.slice(1).split(';').map(decodeURIComponent);
 
     return {
       expression,
-      context,
+      contextString,
       syntaxHighlight
     };
   }
 
-  function serializeHash(expression, context, syntaxHighlight) {
-    window.location.hash = '#' + [ expression, context, syntaxHighlight ].map(encodeURIComponent).join(';');
+  function serializeHash(expression, contextString, syntaxHighlight) {
+    window.location.hash = '#' + [ expression, contextString, syntaxHighlight ].map(encodeURIComponent).join(';');
   }
 
   function mark(editor, node, className) {
@@ -180,7 +183,7 @@
       tree,
       context,
       input
-    } = Feelin.parseExpressions(expression, parseContext(rawContext));
+    } = Feelin.parseExpressions(expression, rawContext);
 
     let txt = '';
 
@@ -284,25 +287,35 @@
 
   }
 
-  function parseContext(context) {
-    if (!context) {
-      return {};
-    }
+  $: try {
+    context = JSON.parse(contextString || {});
 
-    try {
-      return JSON.parse(context);
-    } catch (e) {
-      return {};
+    if (typeof context !== 'object') {
+      context = {};
+
+      throw new Error('expected Object literal');
     }
+    contextParseError = null;
+  } catch (err) {
+    contextParseError = err;
   }
 
   $: expression !== undefined && updateStack(expression, context);
+
+  $: output = (function() {
+    try {
+      return Feelin.evaluate(expression, context);
+    } catch (err) {
+      console.error(err);
+      return 'ERROR';
+    }
+  })();
 
   $: renderSelection(editor, treeSelection);
 
   $: renderSyntax(editor, syntaxHighlight ? treeTokens : []);
 
-  $: serializeHash(expression, context, syntaxHighlight);
+  $: serializeHash(expression, contextString, syntaxHighlight);
 </script>
 
 <main class="vcontainer">
@@ -314,9 +327,9 @@
 
       <div class="container editor">
         <h3 class="legend">
-          Code <select value="expression">
-            <option value="expression">Expressions</option>
-            <option value="unaryTest">Unary Tests</option>
+          Code <select value="expression" disabled="disabled">
+            <option value="expression">Expression(s)</option>
+            <option value="unaryTest">Unary Test(s)</option>
           </select>
 
           <label><input type="checkbox" bind:checked={ syntaxHighlight }> Syntax highlight</label>
@@ -335,7 +348,15 @@
             Context
           </h3>
 
-          <textarea class="content" bind:value={ context }></textarea>
+          <textarea class="content" bind:value={ contextString }></textarea>
+
+          <div class="note" class:error-note={ contextParseError } >
+            {#if contextParseError}
+              Failed to parse as JSON.
+            {:else}
+              Enter JSON object literal.
+            {/if}
+          </div>
         </div>
 
         <div class="container output">
@@ -344,7 +365,7 @@
             Output
           </h3>
 
-          <div class="content"></div>
+          <div class="content">{ JSON.stringify(output, 0, 2) }</div>
         </div>
       </div>
     </div>
@@ -391,6 +412,16 @@
     height: 100%;
   }
 
+  .note {
+    font-size: .9em;
+    margin-top: 7px;
+    color: #666;
+  }
+
+  .error-note {
+    color: red;
+  }
+
   .hcontainer,
   .vcontainer {
     display: flex;
@@ -426,13 +457,18 @@
     display: inline-block;
     padding: 5px 0;
     border-radius: 3px;
-    margin-bottom: 5px;
+    margin: 0 0 5px;
+  }
+
+  .legend label {
+    font-weight: normal;
+    font-size: .90em;
   }
 
   select {
     color: inherit;
     margin-left: 10px;
-    font-size: .95em;
+    font-size: .90em;
   }
 
   .content {
@@ -452,9 +488,15 @@
     padding: 4px;
   }
 
-  .context textarea {
+  .context .content {
     padding: 4px;
     display: block;
+  }
+
+  .output .content {
+    white-space: pre-wrap;
+    font-family: monospace;
+    padding: 4px;
   }
 
   :global(.highlight-container .CodeMirror-code) {

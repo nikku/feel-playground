@@ -33,7 +33,10 @@
   let expression = params.expression || `for
   fruit in [ "apple", "bananas" ], vegetable in vegetables
 return
-  makeSalat(fruit, vegetable)`;
+  { ingredients: [ fruit, vegetable ] }`;
+
+  let output = '';
+  let outputError = null;
 
   let context;
 
@@ -159,7 +162,7 @@ return
     if (selectedNode !== treeSelection) {
       treeSelection = selectedNode;
     }
-  }, 50);
+  }, 150);
 
   function findTreeNode(index, treeRoot) {
 
@@ -326,14 +329,15 @@ return
 
   $: expression !== undefined && updateStack(expression, context, syntaxHighlight);
 
-  $: output = (function() {
-    try {
-      return Feelin.evaluate(expression, context);
-    } catch (err) {
-      console.error(err);
-      return 'ERROR';
-    }
-  })();
+  $: try {
+    output = Feelin.evaluate(expression, context);
+    outputError = null;
+  } catch (err) {
+    console.error(err);
+
+    output = '';
+    outputError = err;
+  }
 
   $: renderSelection(editor, treeSelection);
 
@@ -343,7 +347,18 @@ return
 </script>
 
 <main class="vcontainer">
-  <h1>Try FEEL</h1>
+  <header>
+
+    <h1>
+      Try <span class="feel">FEEL</span>
+    </h1>
+
+    <span class="menu">
+      <a href="https://github.com/nikku/tryfeel/issues">Report an Issue</a> ·
+      <a href="https://github.com/nikku/tryfeel">View on GitHub</a>
+    </span>
+
+  </header>
 
   <div class="views hcontainer">
 
@@ -390,6 +405,14 @@ return
           </h3>
 
           <div class="content">{ JSON.stringify(output, 0, 2) }</div>
+
+          <div class="note" class:error-note={ outputError }>
+            {#if outputError}
+              Evaluation failed: { outputError.message }
+            {:else}
+              Change code or context to re-evaluate output.
+            {/if}
+          </div>
         </div>
       </div>
     </div>
@@ -422,8 +445,21 @@ return
     margin: 0;
   }
 
+  header {
+    margin: 0;
+    padding: 7px 10px;
+    border-bottom: solid 1px #CCC;
+    background: #F9F9F9;
+  }
+
   h1 {
-    margin: 10px;
+    margin: 0;
+    display: inline-block;
+  }
+
+  .menu {
+    float: right;
+    line-height: 32px;
   }
 
   main {

@@ -5,6 +5,10 @@
 
   import TreeNode from './TreeNode.svelte';
 
+  import {
+    debounce
+  } from 'min-dash';
+
   import { NodeProp } from 'lezer';
 
   import { onMount } from 'svelte';
@@ -23,6 +27,8 @@
 
   let syntaxMarks = [];
   let selectionMark;
+
+  let syntaxHighlight = false;
 
   let expression = params.expression || 'for fruit in [ "apple", "bananas" ], vegetable in vegetables return makeSalat(fruit, vegetable)';
 
@@ -74,49 +80,58 @@
     treeSelection = node;
   }
 
+  function clearMark(mark) {
+    mark.clear();
+  }
+
   function renderSyntax(editor, treeTokens) {
 
-    syntaxMarks.forEach(e => e.clear());
+    console.time('renderSyntax');
 
-    if (!editor) {
-      return;
+    syntaxMarks.forEach(clearMark);
+
+    if (editor) {
+
+      syntaxMarks = treeTokens.reduce((marks, node) => {
+
+        marks.push(mark(editor, node, node.tokenType));
+
+        return marks;
+      }, []);
     }
 
-    syntaxMarks = treeTokens.reduce((marks, node) => {
-
-      const { tokenType } = node;
-
-      if (tokenType) {
-        marks.push(mark(editor, node, tokenType));
-      }
-
-      return marks;
-    }, []);
+    console.timeEnd('renderSyntax');
   }
 
   function renderSelection(editor, node) {
+    console.time('renderSelection');
 
     if (selectionMark) {
-      selectionMark.clear();
+      clearMark(selectionMark);
     }
 
-    if (!node || !editor) {
-      return;
+    if (node && editor) {
+      selectionMark = mark(editor, node, 'selection');
     }
 
-    selectionMark = mark(editor, node, 'selection');
+    console.timeEnd('renderSelection');
   }
 
-  function handleEditorOver(event) {
+  const handleEditorOver = debounce(function(event) {
+
     const position = editor.coordsChar({
       left: event.clientX,
       top: event.clientY
-    });
+    }, 'window');
 
     const index = editor.getDoc().indexFromPos(position);
 
-    treeSelection = findTreeNode(index, treeRoot);
-  }
+    const selectedNode = findTreeNode(index, treeRoot);
+
+    if (selectedNode !== treeSelection) {
+      treeSelection = selectedNode;
+    }
+  }, 50);
 
   function findTreeNode(index, treeRoot) {
 
@@ -150,6 +165,8 @@
 
   function updateStack(expression, rawContext) {
 
+    console.time('updateStack');
+
     const stack = [
       {
         children: []
@@ -160,7 +177,8 @@
 
     const {
       tree,
-      context
+      context,
+      input
     } = Feelin.parseExpressions(expression, parseContext(rawContext));
 
     let txt = '';
@@ -176,7 +194,7 @@
 
         const parent = stack[stack.length - 1];
 
-        const skip = '[]()'.includes(name) && parent.name !== 'Interval';
+        const skip = name === input.slice(start, end);
 
         const error = node.prop(NodeProp.error);
 
@@ -208,12 +226,16 @@
 
         parent.children.push(current);
 
-        tokens.push(current);
+        if (current.tokenType) {
+          tokens.push(current);
+        }
       }
     });
 
     treeRoot = stack[0].children[0];
     treeTokens = tokens;
+
+    console.timeEnd('updateStack');
   }
 
   function getTokenType(node) {
@@ -225,6 +247,10 @@
 
     if (error) {
       return 'error';
+    }
+
+    if (name === 'Parameters') {
+      return 'parameters';
     }
 
     if (name === 'List') {
@@ -255,13 +281,6 @@
       return 'name';
     }
 
-    if ('()[]'.includes(name)) {
-      return 'bracket';
-    }
-
-    if (name.charAt(0).toLowerCase() === name.charAt(0)) {
-      return 'keyword';
-    }
   }
 
   function parseContext(context) {
@@ -280,17 +299,17 @@
 
   $: renderSelection(editor, treeSelection);
 
-  $: renderSyntax(editor, treeTokens);
+  $: renderSyntax(editor, syntaxHighlight ? treeTokens : []);
 
   $: serializeHash(expression, context);
 </script>
 
-<main>
+<main class="vcontainer">
   <h1>Try FEEL</h1>
 
-  <div class="views">
+  <div class="views hcontainer">
 
-    <div class="vcontainer" style="flex: .7">
+    <div class="vcontainer" style="flex: .6">
 
       <div class="container editor">
         <h3 class="legend">
@@ -298,9 +317,11 @@
             <option value="expression">Expressions</option>
             <option value="unaryTest">Unary Tests</option>
           </select>
+
+          <label><input type="checkbox" bind:value={ syntaxHighlight }> Syntax highlight</label>
         </h3>
 
-        <div class="content" on:mousemove={ handleEditorOver }>
+        <div class:highlight-container={ syntaxHighlight } class="content" on:mousemove={ handleEditorOver }>
           <textarea bind:this={ editorElement } bind:value={ expression }></textarea>
         </div>
 
@@ -327,7 +348,7 @@
       </div>
     </div>
 
-    <div class="container tree" style="flex: .3">
+    <div class="container tree" style="flex: .4">
 
       <h3 class="legend">
         Tree
@@ -348,6 +369,13 @@
     box-sizing: border-box;
   }
 
+  :global(body, html) {
+    height: 100%;
+    width: 100%;
+
+    margin: 0;
+  }
+
   h1 {
     margin: 10px;
   }
@@ -357,27 +385,38 @@
 
     display: flex;
     flex-direction: column;
+
+    width: 100%;
+    height: 100%;
   }
 
-  .views {
+  .hcontainer,
+  .vcontainer {
     display: flex;
+    align-self: stretch;
     flex: 1;
-  }
 
-  .hcontainer {
-    display: flex;
-    flex: 1;
+    overflow: hidden;
   }
 
   .vcontainer {
+    flex-direction: column;
+  }
+
+  .hcontainer {
+    flex-direction: row;
+  }
+
+  .container {
+    margin: 10px;
     display: flex;
     flex-direction: column;
     flex: 1;
   }
 
-  .container {
-    margin: 10px;
+  .container .content {
     flex: 1;
+    align-self: stretch;
   }
 
   .legend {
@@ -412,33 +451,23 @@
     padding: 4px;
   }
 
-  .context {
-    display: block;
-  }
-
-  .context .content {
+  .context textarea {
     padding: 4px;
     display: block;
-    width: 100%;
   }
 
-  .context .content,
-  .output .content {
-    min-height: 150px;
-    min-width: 100%;
+  :global(.highlight-container .CodeMirror-code) {
+    color: rgb(0, 151, 157);
   }
 
   :global(.mark-selection) {
     background: bisque;
   }
 
-
-  :global(.mark-list) {
-    color: #007400;
-  }
-
+  :global(.mark-parameters),
+  :global(.mark-list),
   :global(.mark-interval) {
-    color: #007400;
+    color: rgb(67, 79, 84);
   }
 
   :global(.mark-string) {
@@ -451,10 +480,6 @@
 
   :global(.mark-boolean) {
     color: #aa0d91;
-  }
-
-  :global(.mark-keyword) {
-    color: rgb(0, 151, 157);
   }
 
   :global(.mark-qname) {

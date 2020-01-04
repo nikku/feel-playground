@@ -17,12 +17,12 @@
   let editor;
 
   let treeRoot = { name: 'Expression', start: 0, end: 0, children: [] };
-  let treeErrors = [];
+  let treeTokens = [];
 
   let treeSelection;
 
-  let editorErrors = [];
-  let editorSelection;
+  let syntaxMarks = [];
+  let selectionMark;
 
   let expression = params.expression || 'for fruit in [ "apple", "bananas" ], vegetable in vegetables return makeSalat(fruit, vegetable)';
 
@@ -56,7 +56,7 @@
     window.location.hash = '#' + [ expression, context ].map(encodeURIComponent).join(';');
   }
 
-  function mark(node, className) {
+  function mark(editor, node, className) {
 
     const doc = editor.getDoc();
 
@@ -66,7 +66,7 @@
     return editor.markText(
       startCoords,
       endCoords,
-      { className }
+      { className: `mark-${className}` }
     );
   }
 
@@ -74,26 +74,37 @@
     treeSelection = node;
   }
 
-  function highlightErrors(errors) {
+  function renderSyntax(editor, treeTokens) {
 
-    editorErrors.forEach(e => e.clear());
+    syntaxMarks.forEach(e => e.clear());
 
-    editorErrors = errors.map(node => {
-      return mark(node, 'error');
-    });
-  }
-
-  function highlightSelection(node) {
-
-    if (editorSelection) {
-      editorSelection.clear();
-    }
-
-    if (!node) {
+    if (!editor) {
       return;
     }
 
-    editorSelection = mark(node, 'selection');
+    syntaxMarks = treeTokens.reduce((marks, node) => {
+
+      const { tokenType } = node;
+
+      if (tokenType) {
+        marks.push(mark(editor, node, tokenType));
+      }
+
+      return marks;
+    }, []);
+  }
+
+  function renderSelection(editor, node) {
+
+    if (selectionMark) {
+      selectionMark.clear();
+    }
+
+    if (!node || !editor) {
+      return;
+    }
+
+    selectionMark = mark(editor, node, 'selection');
   }
 
   function handleEditorOver(event) {
@@ -145,7 +156,7 @@
       }
     ];
 
-    const errors = [];
+    const tokens = [];
 
     const {
       tree,
@@ -169,11 +180,11 @@
           error
         };
 
-        stack.push(_node);
+        stack.push({
+          ..._node,
+          tokenType: getTokenType(_node)
+        });
 
-        if (error) {
-          errors.push(_node);
-        }
       },
 
       leave(node, start, end) {
@@ -183,11 +194,52 @@
         const parent = stack[stack.length - 1];
 
         parent.children.push(current);
+
+        tokens.push(current);
       }
     });
 
     treeRoot = stack[0].children[0];
-    treeErrors = errors;
+    treeTokens = tokens;
+  }
+
+  function getTokenType(node) {
+
+    const {
+      name,
+      error
+    } = node;
+
+    const brackets = {
+      ')': 1,
+      '(': 1,
+      ']': 1,
+      '[': 1,
+    };
+
+    if (error) {
+      return 'error';
+    }
+
+    if (brackets[name]) {
+      return 'bracket';
+    }
+
+    if (name.endsWith('Literal')) {
+      return 'literal';
+    }
+
+    if (name === 'QualifiedName') {
+      return 'qname';
+    }
+
+    if (name === 'Name') {
+      return 'name';
+    }
+
+    if (name.charAt(0).toLowerCase() === name.charAt(0)) {
+      return 'keyword';
+    }
   }
 
   function parseContext(context) {
@@ -204,9 +256,9 @@
 
   $: expression !== undefined && updateStack(expression, context);
 
-  $: highlightSelection(treeSelection);
+  $: renderSelection(editor, treeSelection);
 
-  $: highlightErrors(treeErrors);
+  $: renderSyntax(editor, treeTokens);
 
   $: serializeHash(expression, context);
 </script>
@@ -354,12 +406,35 @@
     min-width: 100%;
   }
 
-  :global(.selection) {
+  :global(.mark-selection) {
     background: bisque;
   }
 
-  :global(.error) {
+  :global(.mark-error) {
     text-decoration: underline;
     color: red;
+  }
+
+  :global(.mark-literal) {
+    color: #d14;
+  }
+
+  :global(.mark-keyword) {
+    color: #333;
+    font-weight: bold;
+  }
+
+  :global(.mark-bracket) {
+    color: #333;
+  }
+
+  :global(.mark-qname) {
+    color: #0086b3;
+    font-weight: bold;
+  }
+
+  :global(.mark-name) {
+    font-weight: normal;
+    color: #0086b3;
   }
 </style>

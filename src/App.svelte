@@ -170,10 +170,14 @@
     tree.iterate({
       enter(node, start, end) {
 
+        const {
+          name
+        } = node;
+
         const error = node.prop(NodeProp.error);
 
         const _node = {
-          name: node.name,
+          name,
           start,
           end,
           children: [],
@@ -210,23 +214,28 @@
       error
     } = node;
 
-    const brackets = {
-      ')': 1,
-      '(': 1,
-      ']': 1,
-      '[': 1,
-    };
-
     if (error) {
       return 'error';
     }
 
-    if (brackets[name]) {
-      return 'bracket';
+    if (name === 'List') {
+      return 'list';
     }
 
-    if (name.endsWith('Literal')) {
-      return 'literal';
+    if (name === 'Interval') {
+      return 'interval';
+    }
+
+    if (name === 'StringLiteral') {
+      return 'string';
+    }
+
+    if (name === 'NumericLiteral') {
+      return 'number';
+    }
+
+    if (name === 'BooleanLiteral') {
+      return 'boolean';
     }
 
     if (name === 'QualifiedName') {
@@ -235,6 +244,10 @@
 
     if (name === 'Name') {
       return 'name';
+    }
+
+    if ('()[]'.includes(name)) {
+      return 'bracket';
     }
 
     if (name.charAt(0).toLowerCase() === name.charAt(0)) {
@@ -410,31 +423,41 @@
     background: bisque;
   }
 
-  :global(.mark-error) {
-    text-decoration: underline;
-    color: red;
+
+  :global(.mark-list) {
+    color: #007400;
   }
 
-  :global(.mark-literal) {
-    color: #d14;
+  :global(.mark-interval) {
+    color: #007400;
+  }
+
+  :global(.mark-string) {
+    color: #c41a16;
+  }
+
+  :global(.mark-number) {
+    color: #1c00cf;
+  }
+
+  :global(.mark-boolean) {
+    color: #aa0d91;
   }
 
   :global(.mark-keyword) {
-    color: #333;
-    font-weight: bold;
-  }
-
-  :global(.mark-bracket) {
-    color: #333;
+    color: rgb(0, 151, 157);
   }
 
   :global(.mark-qname) {
-    color: #0086b3;
-    font-weight: bold;
+    color: rgb(67, 79, 84);
   }
 
   :global(.mark-name) {
-    font-weight: normal;
-    color: #0086b3;
+    color: rgb(67, 79, 84);
+  }
+
+  :global(.mark-error) {
+    text-decoration: underline;
+    color: red;
   }
 </style>

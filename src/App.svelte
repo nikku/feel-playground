@@ -28,7 +28,7 @@
   let syntaxMarks = [];
   let selectionMark;
 
-  let syntaxHighlight = false;
+  let syntaxHighlight = params.syntaxHighlight === 'true';
 
   let expression = params.expression || 'for fruit in [ "apple", "bananas" ], vegetable in vegetables return makeSalat(fruit, vegetable)';
 
@@ -50,16 +50,19 @@
 
     const hash = window.location.hash;
 
-    const [ expression, context ] = hash.slice(1).split(';').map(decodeURIComponent);
+    const [ expression, context, syntaxHighlight ] = hash.slice(1).split(';').map(decodeURIComponent);
 
     return {
       expression,
-      context
+      context,
+      syntaxHighlight
     };
   }
 
-  function serializeHash(expression, context) {
-    window.location.hash = '#' + [ expression, context ].map(encodeURIComponent).join(';');
+  function serializeHash(expression, context, syntaxHighlight) {
+    console.log(syntaxHighlight);
+
+    window.location.hash = '#' + [ expression, context, syntaxHighlight ].map(encodeURIComponent).join(';');
   }
 
   function mark(editor, node, className) {
@@ -301,7 +304,7 @@
 
   $: renderSyntax(editor, syntaxHighlight ? treeTokens : []);
 
-  $: serializeHash(expression, context);
+  $: serializeHash(expression, context, syntaxHighlight);
 </script>
 
 <main class="vcontainer">
@@ -318,7 +321,7 @@
             <option value="unaryTest">Unary Tests</option>
           </select>
 
-          <label><input type="checkbox" bind:value={ syntaxHighlight }> Syntax highlight</label>
+          <label><input type="checkbox" bind:checked={ syntaxHighlight }> Syntax highlight</label>
         </h3>
 
         <div class:highlight-container={ syntaxHighlight } class="content" on:mousemove={ handleEditorOver }>

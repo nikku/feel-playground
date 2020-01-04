@@ -453,6 +453,7 @@ return
   }
 
   h1 {
+    color: #444;
     margin: 0;
     display: inline-block;
   }

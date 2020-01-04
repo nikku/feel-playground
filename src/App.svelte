@@ -30,11 +30,18 @@
 
   let syntaxHighlight = params.syntaxHighlight !== 'false';
 
-  let expression = params.expression || 'for fruit in [ "apple", "bananas" ], vegetable in vegetables return makeSalat(fruit, vegetable)';
+  let expression = params.expression || `for
+  fruit in [ "apple", "bananas" ], vegetable in vegetables
+return
+  makeSalat(fruit, vegetable)`;
 
   let context;
 
-  let contextString = params.contextString || '{}';
+  let contextString = params.contextString || `{
+  "a": 1,
+  "Mike's age": 35
+}`;
+
   let contextParseError;
 
   onMount(() => {
@@ -70,13 +77,30 @@
 
     const doc = editor.getDoc();
 
-    const startCoords = doc.posFromIndex(node.start);
-    const endCoords = doc.posFromIndex(node.end);
+    let start = node.start;
+    let end = node.end;
+
+    let type = '';
+
+    if (start === end) {
+
+      if (start > 0) {
+        start--;
+        type = '-after';
+      } else {
+        end++;
+        type = '-before';
+      }
+    }
+
+    const startCoords = doc.posFromIndex(start);
+
+    const endCoords = doc.posFromIndex(end);
 
     return editor.markText(
       startCoords,
       endCoords,
-      { className: `mark-${className}` }
+      { className: `mark-${className}${type}` }
     );
   }
 
@@ -167,7 +191,7 @@
 
   }
 
-  function updateStack(expression, rawContext) {
+  function updateStack(expression, rawContext, syntaxHighlight) {
 
     console.time('updateStack');
 
@@ -230,7 +254,7 @@
 
         parent.children.push(current);
 
-        if (current.tokenType) {
+        if (syntaxHighlight && current.tokenType || current.error) {
           tokens.push(current);
         }
       }
@@ -300,7 +324,7 @@
     contextParseError = err;
   }
 
-  $: expression !== undefined && updateStack(expression, context);
+  $: expression !== undefined && updateStack(expression, context, syntaxHighlight);
 
   $: output = (function() {
     try {
@@ -313,7 +337,7 @@
 
   $: renderSelection(editor, treeSelection);
 
-  $: renderSyntax(editor, syntaxHighlight ? treeTokens : []);
+  $: renderSyntax(editor, treeTokens);
 
   $: serializeHash(expression, contextString, syntaxHighlight);
 </script>
@@ -497,6 +521,11 @@
     white-space: pre-wrap;
     font-family: monospace;
     padding: 4px;
+    overflow: auto;
+  }
+
+  :global(.CodeMirror) {
+    height: 100%;
   }
 
   :global(.highlight-container .CodeMirror-code) {
@@ -536,5 +565,29 @@
   :global(.mark-error) {
     text-decoration: underline;
     color: red;
+  }
+
+  :global(.mark-error-before) {
+    position: relative;
+  }
+
+  :global(.mark-error-before):before {
+    position: absolute;
+    z-index: 300;
+    content: '\200B';
+    border-left: dotted 1px red;
+    margin-left: -1px;
+  }
+
+  :global(.mark-error-after) {
+    position: relative;
+  }
+
+  :global(.mark-error-after):after {
+    position: absolute;
+    z-index: 300;
+    content: '\200B';
+    border-right: dotted 1px red;
+    margin-right: -1px;
   }
 </style>

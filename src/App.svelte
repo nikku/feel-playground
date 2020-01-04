@@ -174,6 +174,10 @@
           name
         } = node;
 
+        const parent = stack[stack.length - 1];
+
+        const skip = '[]()'.includes(name) && parent.name !== 'Interval';
+
         const error = node.prop(NodeProp.error);
 
         const _node = {
@@ -181,7 +185,8 @@
           start,
           end,
           children: [],
-          error
+          error,
+          skip
         };
 
         stack.push({
@@ -194,6 +199,10 @@
       leave(node, start, end) {
 
         const current = stack.pop();
+
+        if (current.skip) {
+          return;
+        }
 
         const parent = stack[stack.length - 1];
 

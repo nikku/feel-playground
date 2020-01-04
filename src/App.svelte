@@ -41,7 +41,7 @@ return
   let context;
 
   let contextString = params.contextString || `{
-  "a": 1,
+  "vegetables": [ "garlic", "tomato" ],
   "Mike's age": 35
 }`;
 

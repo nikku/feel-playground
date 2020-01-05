@@ -15,10 +15,12 @@
 
   const params = parseParams();
 
-  let editorElement;
+  let codeEditorElement;
+  let contextEditorElement;
   let treeElement;
 
-  let editor;
+  let codeEditor;
+  let contextEditor;
 
   let treeRoot = { name: 'Expression', start: 0, end: 0, children: [] };
   let treeTokens = [];
@@ -48,15 +50,26 @@ return
   let contextParseError;
 
   onMount(() => {
-    editor = CodeMirror.fromTextArea(editorElement, {
+    codeEditor = CodeMirror.fromTextArea(codeEditorElement, {
       lineNumbers: true
     });
 
     const updateExpression = () => {
-      expression = editor.getDoc().getValue();
+      expression = codeEditor.getDoc().getValue();
     };
 
-    editor.on('change', updateExpression);
+    codeEditor.on('change', updateExpression);
+
+    contextEditor = CodeMirror.fromTextArea(contextEditorElement, {
+      mode: { name: 'javascript', json: true },
+      theme: 'default'
+    });
+
+    const updateContext = () => {
+      contextString = contextEditor.getDoc().getValue();
+    };
+
+    contextEditor.on('change', updateContext);
   });
 
   function parseParams() {
@@ -150,12 +163,12 @@ return
 
   const handleEditorOver = debounce(function(event) {
 
-    const position = editor.coordsChar({
+    const position = codeEditor.coordsChar({
       left: event.clientX,
       top: event.clientY
     }, 'window');
 
-    const index = editor.getDoc().indexFromPos(position);
+    const index = codeEditor.getDoc().indexFromPos(position);
 
     const selectedNode = findTreeNode(index, treeRoot);
 
@@ -280,12 +293,20 @@ return
       return 'error';
     }
 
+    if (name === 'BlockComment' || name === 'LineComment') {
+      return 'comment';
+    }
+
     if (name === 'Parameters') {
       return 'parameters';
     }
 
     if (name === 'List') {
       return 'list';
+    }
+
+    if (name === 'Context') {
+      return 'context';
     }
 
     if (name === 'Interval') {
@@ -339,9 +360,9 @@ return
     outputError = err;
   }
 
-  $: renderSelection(editor, treeSelection);
+  $: renderSelection(codeEditor, treeSelection);
 
-  $: renderSyntax(editor, treeTokens);
+  $: renderSyntax(codeEditor, treeTokens);
 
   $: serializeHash(expression, contextString, syntaxHighlight);
 </script>
@@ -364,7 +385,7 @@ return
 
     <div class="vcontainer" style="flex: .6">
 
-      <div class="container editor">
+      <div class="container code-editor">
         <h3 class="legend">
           Code <select value="expression" disabled="disabled">
             <option value="expression">Expression(s)</option>
@@ -375,19 +396,21 @@ return
         </h3>
 
         <div class:highlight-container={ syntaxHighlight } class="content" on:mousemove={ handleEditorOver }>
-          <textarea bind:this={ editorElement } bind:value={ expression }></textarea>
+          <textarea bind:this={ codeEditorElement } bind:value={ expression }></textarea>
         </div>
 
       </div>
 
       <div class="hcontainer">
-        <div class="container context">
+        <div class="container context-editor">
 
           <h3 class="legend">
-            Context
+            Input
           </h3>
 
-          <textarea class="content" bind:value={ contextString }></textarea>
+          <div class="content">
+            <textarea bind:this={ contextEditorElement } bind:value={ contextString }></textarea>
+          </div>
 
           <div class="note" class:error-note={ contextParseError } >
             {#if contextParseError}
@@ -540,18 +563,13 @@ return
     border-radius: 3px;
   }
 
-  .editor .content {
+  .code-editor .content {
     overflow: hidden;
   }
 
   .tree .content {
     overflow: auto;
     padding: 4px;
-  }
-
-  .context .content {
-    padding: 4px;
-    display: block;
   }
 
   .output .content {
@@ -566,7 +584,11 @@ return
   }
 
   :global(.highlight-container .CodeMirror-code) {
-    color: rgb(0, 151, 157);
+    color: #708;
+  }
+
+  :global(.mark-comment) {
+    color: #a50;
   }
 
   :global(.mark-selection) {
@@ -574,29 +596,30 @@ return
   }
 
   :global(.mark-parameters),
+  :global(.mark-context),
   :global(.mark-list),
   :global(.mark-interval) {
     color: rgb(67, 79, 84);
   }
 
   :global(.mark-string) {
-    color: #c41a16;
+    color: #a11;
   }
 
   :global(.mark-number) {
-    color: #1c00cf;
+    color: #164;
   }
 
   :global(.mark-boolean) {
-    color: #aa0d91;
+    color: #219;
   }
 
   :global(.mark-qname) {
-    color: rgb(67, 79, 84);
+    color: #05a;
   }
 
   :global(.mark-name) {
-    color: rgb(67, 79, 84);
+    color: #05a;
   }
 
   :global(.mark-error) {

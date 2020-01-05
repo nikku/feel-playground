@@ -10,7 +10,7 @@
     "@rollup/plugin-commonjs": "^11.0.0",
     "@rollup/plugin-node-resolve": "^6.0.0",
     "codemirror": "^5.50.2",
-    "feelin": "^0.11.4",
+    "feelin": "^0.11.5",
     "min-dash": "^3.5.2",
     "rollup": "^1.20.0",
     "rollup-plugin-copy": "^3.1.0",

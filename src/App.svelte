@@ -433,7 +433,7 @@ return
             {#if outputError}
               Evaluation failed: { outputError.message }
             {:else}
-              Change code or context to re-evaluate output.
+              Change code or input to re-compute output.
             {/if}
           </div>
         </div>
@@ -469,10 +469,12 @@ return
   }
 
   header {
-    margin: 0;
-    padding: 7px 10px;
     border-bottom: solid 1px #CCC;
     background: #F9F9F9;
+
+    margin: 0;
+    margin-bottom: 10px;
+    padding: 7px 10px;
   }
 
   h1 {
@@ -563,7 +565,8 @@ return
     border-radius: 3px;
   }
 
-  .code-editor .content {
+  .code-editor .content,
+  .context-editor .content {
     overflow: hidden;
   }
 

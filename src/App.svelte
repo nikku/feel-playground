@@ -161,7 +161,7 @@ return
     console.timeEnd('renderSelection');
   }
 
-  const handleEditorOver = debounce(function(event) {
+  const handleEditorOver = function(event) {
 
     const position = codeEditor.coordsChar({
       left: event.clientX,
@@ -175,7 +175,7 @@ return
     if (selectedNode !== treeSelection) {
       treeSelection = selectedNode;
     }
-  }, 150);
+  }
 
   function findTreeNode(index, treeRoot) {
 
@@ -207,7 +207,7 @@ return
 
   }
 
-  function updateStack(expression, rawContext, syntaxHighlight) {
+  const updateStack = debounce(function updateStack(expression, rawContext, syntaxHighlight) {
 
     console.time('updateStack');
 
@@ -280,7 +280,22 @@ return
     treeTokens = tokens;
 
     console.timeEnd('updateStack');
-  }
+  }, 300);
+
+  const parseContext = debounce(function parseContext(contextString) {
+    try {
+      context = JSON.parse(contextString || {});
+
+      if (typeof context !== 'object') {
+        context = {};
+
+        throw new Error('expected Object literal');
+      }
+      contextParseError = null;
+    } catch (err) {
+      contextParseError = err;
+    }
+  }, 300);
 
   function getTokenType(node) {
 
@@ -335,30 +350,23 @@ return
 
   }
 
-  $: try {
-    context = JSON.parse(contextString || {});
+  const evaluateExpression = debounce(function evaluateExpression(expression, context) {
+    try {
+      output = Feelin.evaluate(expression, context);
+      outputError = null;
+    } catch (err) {
+      console.error(err);
 
-    if (typeof context !== 'object') {
-      context = {};
-
-      throw new Error('expected Object literal');
+      output = null;
+      outputError = err;
     }
-    contextParseError = null;
-  } catch (err) {
-    contextParseError = err;
-  }
+  }, 300);
+
+  $: parseContext(contextString);
 
   $: expression !== undefined && updateStack(expression, context, syntaxHighlight);
 
-  $: try {
-    output = Feelin.evaluate(expression, context);
-    outputError = null;
-  } catch (err) {
-    console.error(err);
-
-    output = '';
-    outputError = err;
-  }
+  $: evaluateExpression(expression, context);
 
   $: renderSelection(codeEditor, treeSelection);
 
@@ -387,7 +395,7 @@ return
 
       <div class="container code-editor">
         <h3 class="legend">
-          Code <select value="expression" disabled="disabled">
+          Code <select name="codeType" value="expression" disabled="disabled">
             <option value="expression">Expression(s)</option>
             <option value="unaryTest">Unary Test(s)</option>
           </select>
@@ -396,7 +404,7 @@ return
         </h3>
 
         <div class:highlight-container={ syntaxHighlight } class="content" on:mousemove={ handleEditorOver }>
-          <textarea bind:this={ codeEditorElement } bind:value={ expression }></textarea>
+          <textarea name="expression" bind:this={ codeEditorElement } bind:value={ expression }></textarea>
         </div>
 
       </div>
@@ -409,7 +417,7 @@ return
           </h3>
 
           <div class="content">
-            <textarea bind:this={ contextEditorElement } bind:value={ contextString }></textarea>
+            <textarea name="contextString" bind:this={ contextEditorElement } bind:value={ contextString }></textarea>
           </div>
 
           <div class="note" class:error-note={ contextParseError } >
@@ -427,7 +435,7 @@ return
             Output
           </h3>
 
-          <div class="content">{ JSON.stringify(output, 0, 2) }</div>
+          <div class="content">{ output && JSON.stringify(output, 0, 2) || '' }</div>
 
           <div class="note" class:error-note={ outputError }>
             {#if outputError}
@@ -530,6 +538,7 @@ return
     display: flex;
     flex-direction: column;
     flex: 1;
+    overflow: hidden;
   }
 
   .container .content {
@@ -573,6 +582,7 @@ return
   .tree .content {
     overflow: auto;
     padding: 4px;
+    min-width: 200px;
   }
 
   .output .content {

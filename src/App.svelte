@@ -37,7 +37,7 @@
 return
   { ingredients: [ fruit, vegetable ] }`;
 
-  let output = '';
+  let output = undefined;
   let outputError = null;
 
   let context;
@@ -308,6 +308,10 @@ return
       return 'error';
     }
 
+    if (name === 'BuiltInFunctionName') {
+      return 'builtin';
+    }
+
     if (name === 'BlockComment' || name === 'LineComment') {
       return 'comment';
     }
@@ -357,7 +361,7 @@ return
     } catch (err) {
       console.error(err);
 
-      output = null;
+      output = undefined;
       outputError = err;
     }
   }, 300);
@@ -435,7 +439,7 @@ return
             Output
           </h3>
 
-          <div class="content">{ output && JSON.stringify(output, 0, 2) || '' }</div>
+          <div class="content">{ typeof output !== 'undefined' && JSON.stringify(output, 0, 2) || '' }</div>
 
           <div class="note" class:error-note={ outputError }>
             {#if outputError}
@@ -617,6 +621,10 @@ return
 
   :global(.mark-string) {
     color: #a11;
+  }
+
+  :global(.mark-builtin) {
+    color: #30a;
   }
 
   :global(.mark-number) {

@@ -2,7 +2,9 @@
 
 A playground to try out and learn the FEEL language in your browser.
 
-__[Demo](https://nikku.github.io/tryfeel)__
+[![Tryfeel screenshot](./docs/screenshot.png)](https://nikku.github.io/tryfeel)
+
+__[Try it out.](https://nikku.github.io/tryfeel)__
 
 
 ## Related

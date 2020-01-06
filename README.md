@@ -1,10 +1,10 @@
-# Try FEEL
+# feel-playground
 
-A playground to try out and learn the FEEL language in your browser.
+An interactive app to try out and learn the DMN FEEL language in your browser.
 
-[![Tryfeel screenshot](./docs/screenshot.png)](https://nikku.github.io/tryfeel)
+[![FEEL playground screenshot](./docs/screenshot.png)](https://nikku.github.io/feel-playground)
 
-__[Try it out.](https://nikku.github.io/tryfeel)__
+Check it out [in action](https://nikku.github.io/feel-playground).
 
 
 ## Related

@@ -391,13 +391,13 @@ return
 <main class="vcontainer">
   <header>
 
-    <h1>
-      Try <span class="feel">FEEL</span>
+    <h1 title="Try out and learn the DMN FEEL language">
+      FEEL Playground
     </h1>
 
     <span class="menu">
-      <a href="https://github.com/nikku/tryfeel/issues">Report an Issue</a> ·
-      <a href="https://github.com/nikku/tryfeel">View on GitHub</a>
+      <a href="https://github.com/nikku/feel-playground/issues">Report an Issue</a> ·
+      <a href="https://github.com/nikku/feel-playground">View on GitHub</a>
     </span>
 
   </header>

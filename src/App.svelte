@@ -312,6 +312,15 @@ return
       return 'builtin';
     }
 
+    if (
+      name === 'BuiltInType' ||
+      name === 'ListType' ||
+      name === 'ContextType' ||
+      name === 'FunctionType'
+    ) {
+      return 'builtin';
+    }
+
     if (name === 'BlockComment' || name === 'LineComment') {
       return 'comment';
     }

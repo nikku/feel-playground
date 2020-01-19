@@ -390,16 +390,16 @@ return
 </script>
 
 <main class="vcontainer">
-  <header>
+  <header class="hcontainer">
 
-    <h1 title="Try out and learn the DMN FEEL language">
-      FEEL Playground
-    </h1>
+    <a href="/" class="logo">
+      <img alt="FEEL Playground Logo" src="logo.svg" />
+    </a>
 
-    <span class="menu">
+    <div class="menu">
       <a href="https://github.com/nikku/feel-playground/issues">Report an Issue</a> ·
       <a href="https://github.com/nikku/feel-playground">View on GitHub</a>
-    </span>
+    </div>
 
   </header>
 
@@ -491,23 +491,35 @@ return
   }
 
   header {
-    border-bottom: solid 1px #CCC;
-    background: #F9F9F9;
+    box-shadow: 0 0 3px 0 #999;
+    background: hsl(207, 56%, 99%);
 
     margin: 0;
     margin-bottom: 10px;
     padding: 7px 10px;
   }
 
-  h1 {
-    color: #444;
+  header.hcontainer {
+    flex-grow: 0;
+    flex-shrink: 0;
+    overflow: initial;
+    align-items: center;
+  }
+
+  .logo {
     margin: 0;
-    display: inline-block;
+    display: block;
+    height: 26px;
+  }
+
+  .logo img {
+    height: 100%;
   }
 
   .menu {
-    float: right;
     line-height: 32px;
+    flex-grow: 1;
+    text-align: right;
   }
 
   main {

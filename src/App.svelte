@@ -51,7 +51,8 @@ return
 
   onMount(() => {
     codeEditor = CodeMirror.fromTextArea(codeEditorElement, {
-      lineNumbers: true
+      lineNumbers: true,
+      mode: null
     });
 
     const updateExpression = () => {

@@ -393,8 +393,17 @@ return
   <header class="hcontainer">
 
     <a href="/" class="logo">
-      <img alt="FEEL Playground Logo" src="logo.svg" />
+      <img alt="F" src="logo.svg" />
     </a>
+
+    <span style="
+        font-weight: bold;
+        font-size: 1.2em;
+        color: steelblue;
+        margin-left: 2px;
+    "><span aria-hidden="false" style="
+        display: none;
+    ">F</span>eel Playground</span>
 
     <div class="menu">
       <a href="https://github.com/nikku/feel-playground/issues">Report an Issue</a> ·

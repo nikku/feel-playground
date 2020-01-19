@@ -222,8 +222,7 @@ return
 
     const {
       tree,
-      context,
-      input
+      parsedInput
     } = Feelin.parseExpressions(expression, rawContext);
 
     let txt = '';
@@ -239,7 +238,7 @@ return
 
         const parent = stack[stack.length - 1];
 
-        const skip = name === input.slice(start, end);
+        const skip = name === parsedInput.slice(start, end);
 
         const error = node.prop(NodeProp.error);
 

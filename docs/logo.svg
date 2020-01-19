@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="22.962mm"
+   height="22.962mm"
+   viewBox="0 0 22.962 22.962"
+   version="1.1"
+   id="svg8"
+   inkscape:export-filename="/home/nikku/camunda/projects/bpmn-io/.other/experiments/feel-playground/src/favicon.png"
+   inkscape:export-xdpi="282.07001"
+   inkscape:export-ydpi="282.07001"
+   inkscape:version="0.92.4 5da689c313, 2019-01-14"
+   sodipodi:docname="logo.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.8"
+     inkscape:cx="127.11188"
+     inkscape:cy="-73.549327"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="2552"
+     inkscape:window-height="1379"
+     inkscape:window-x="0"
+     inkscape:window-y="57"
+     inkscape:window-maximized="0"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-17.764881,-21.644398)">
+    <rect
+       style="fill:#4682b4;fill-opacity:1;stroke:none;stroke-width:1.49799991;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1.49800001, 5.99199998"
+       id="rect3717"
+       width="22.962"
+       height="22.962"
+       x="17.764881"
+       y="21.644398"
+       rx="5"
+       inkscape:export-xdpi="282.07001"
+       inkscape:export-ydpi="282.07001" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:19.7555542px;line-height:1.25;font-family:'Permanent Marker';-inkscape-font-specification:'Permanent Marker';letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;fill:#ffffff;stroke-width:0.26458332"
+       x="22.579861"
+       y="40.780235"
+       id="text3715"
+       inkscape:export-xdpi="282.07001"
+       inkscape:export-ydpi="282.07001"><tspan
+         sodipodi:role="line"
+         id="tspan3713"
+         x="22.579861"
+         y="40.780235"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Permanent Marker';-inkscape-font-specification:'Permanent Marker';fill:#ffffff;stroke-width:0.26458332">F</tspan></text>
+  </g>
+</svg>

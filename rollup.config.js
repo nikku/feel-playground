@@ -28,7 +28,7 @@ export default {
 
     copy({
       targets: [
-        { src: 'src/index.html', dest: 'public' },
+        { src: 'src/*.{html,png,svg}', dest: 'public' },
         { src: 'node_modules/codemirror/lib', dest: 'public/vendor/codemirror' },
         { src: 'node_modules/codemirror/mode/javascript', dest: 'public/vendor/codemirror/mode' },
         { src: 'node_modules/feelin/dist', dest: 'public/vendor/feelin' }

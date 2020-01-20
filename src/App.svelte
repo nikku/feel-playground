@@ -27,6 +27,8 @@
 
   let treeSelection;
 
+  let feelType = params.feelType || 'expression';
+
   let syntaxMarks = [];
   let selectionMark;
 
@@ -77,17 +79,18 @@ return
 
     const hash = window.location.hash;
 
-    const [ expression, contextString, syntaxHighlight ] = hash.slice(1).split(';').map(decodeURIComponent);
+    const [ expression, contextString, syntaxHighlight, feelType ] = hash.slice(1).split(';').map(decodeURIComponent);
 
     return {
       expression,
       contextString,
-      syntaxHighlight
+      syntaxHighlight,
+      feelType
     };
   }
 
-  function serializeHash(expression, contextString, syntaxHighlight) {
-    window.location.hash = '#' + [ expression, contextString, syntaxHighlight ].map(encodeURIComponent).join(';');
+  function serializeHash(expression, contextString, syntaxHighlight, feelType) {
+    window.location.hash = '#' + [ expression, contextString, syntaxHighlight, feelType ].map(encodeURIComponent).join(';');
   }
 
   function mark(editor, node, className) {
@@ -208,7 +211,7 @@ return
 
   }
 
-  const updateStack = debounce(function updateStack(expression, rawContext, syntaxHighlight) {
+  const updateStack = debounce(function updateStack(feelType, expression, rawContext, syntaxHighlight) {
 
     console.time('updateStack');
 
@@ -220,10 +223,12 @@ return
 
     const tokens = [];
 
+    const parse = feelType === 'unaryTest' ? Feelin.parseUnaryTests : Feelin.parseExpressions;
+
     const {
       tree,
       parsedInput
-    } = Feelin.parseExpressions(expression, rawContext);
+    } = parse(expression, rawContext);
 
     let txt = '';
 
@@ -363,9 +368,12 @@ return
 
   }
 
-  const evaluateExpression = debounce(function evaluateExpression(expression, context) {
+  const evaluateExpression = debounce(function evaluateExpression(feelType, expression, context) {
+
+    const evaluate = feelType === 'unaryTest' ? Feelin.unaryTest : Feelin.evaluate;
+
     try {
-      output = Feelin.evaluate(expression, context);
+      output = evaluate(expression, context);
       outputError = null;
     } catch (err) {
       console.error(err);
@@ -377,15 +385,15 @@ return
 
   $: parseContext(contextString);
 
-  $: expression !== undefined && updateStack(expression, context, syntaxHighlight);
+  $: expression !== undefined && updateStack(feelType, expression, context, syntaxHighlight);
 
-  $: evaluateExpression(expression, context);
+  $: evaluateExpression(feelType, expression, context);
 
   $: renderSelection(codeEditor, treeSelection);
 
   $: renderSyntax(codeEditor, treeTokens);
 
-  $: serializeHash(expression, contextString, syntaxHighlight);
+  $: serializeHash(expression, contextString, syntaxHighlight, feelType);
 </script>
 
 <main class="vcontainer">
@@ -417,12 +425,14 @@ return
 
       <div class="container code-editor">
         <h3 class="legend">
-          Code <select name="codeType" value="expression" disabled="disabled">
-            <option value="expression">Expression(s)</option>
-            <option value="unaryTest">Unary Test(s)</option>
+          Code <select class="typeselect" name="feelType" bind:value={ feelType }>
+            <option value="expression">Expression</option>
+            <option value="unaryTest">Unary Test</option>
           </select>
 
-          <label><input type="checkbox" bind:checked={ syntaxHighlight }> Syntax highlight</label>
+          <span class="right">
+            <label><input type="checkbox" bind:checked={ syntaxHighlight }> Syntax highlight</label>
+          </span>
         </h3>
 
         <div class:highlight-container={ syntaxHighlight } class="content" on:mousemove={ handleEditorOver }>
@@ -447,6 +457,9 @@ return
               Failed to parse as JSON.
             {:else}
               Enter JSON object literal.
+              {#if feelType === 'unaryTest'}
+                Input named <code>?</code> is treated as value to test.
+              {/if}
             {/if}
           </div>
         </div>
@@ -550,6 +563,22 @@ return
     color: red;
   }
 
+  .typeselect {
+    display: inline-block;
+    padding: .275rem 2rem .275rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.3;
+    color: #495057;
+    vertical-align: middle;
+    background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right .75rem center/8px 10px;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
   .hcontainer,
   .vcontainer {
     display: flex;
@@ -580,13 +609,20 @@ return
     align-self: stretch;
   }
 
+  .legend .right {
+    flex-grow: 1;
+    text-align: right;
+  }
+
   .legend {
     font-size: 1.2em;
     color: #444;
-    display: inline-block;
-    padding: 5px 0;
     border-radius: 3px;
     margin: 0 0 5px;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    line-height: 2em;
   }
 
   .legend label {

@@ -559,6 +559,10 @@ return
     color: #666;
   }
 
+  .note code {
+    font-weight: bold;
+  }
+
   .error-note {
     color: red;
   }

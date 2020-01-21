@@ -3,16 +3,16 @@ const CACHE = 'feel-playground-cache-v1';
 function precache() {
   return caches.open(CACHE).then(function(cache) {
     return cache.addAll([
-      '/',
-      '/vendor/codemirror/lib/codemirror.css',
-      '/vendor/codemirror/lib/codemirror.js',
-      '/vendor/codemirror/mode/javascript/javascript.js',
-      '/vendor/feelin/dist/feelin.umd.js',
-      '/bundle.css',
-      '/bundle.js',
-      '/favicon.png',
-      '/logo.svg',
-      '/manifest.json'
+      './',
+      './vendor/codemirror/lib/codemirror.css',
+      './vendor/codemirror/lib/codemirror.js',
+      './vendor/codemirror/mode/javascript/javascript.js',
+      './vendor/feelin/dist/feelin.umd.js',
+      './bundle.css',
+      './bundle.js',
+      './favicon.png',
+      './logo.svg',
+      './manifest.json'
     ]).catch(err => console.error('caching failed', err));
   });
 }

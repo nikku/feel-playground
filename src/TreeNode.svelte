@@ -19,7 +19,7 @@
 
   afterUpdate(() => {
     if (selected) {
-      el.scrollIntoViewIfNeeded ? el.scrollIntoViewIfNeeded() : el.scrollIntoView();
+      el.scrollIntoViewIfNeeded();
     }
   });
 </script>

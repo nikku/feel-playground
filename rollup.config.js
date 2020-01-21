@@ -30,9 +30,7 @@ export default [
       copy({
         targets: [
           { src: 'src/*.{html,png,svg,json}', dest: 'public' },
-          { src: 'node_modules/codemirror/lib', dest: 'public/vendor/codemirror' },
-          { src: 'node_modules/codemirror/mode/javascript', dest: 'public/vendor/codemirror/mode' },
-          { src: 'node_modules/feelin/dist', dest: 'public/vendor/feelin' }
+          { src: 'node_modules/codemirror/lib/*.css', dest: 'public/vendor/codemirror' }
         ]
       }),
 
@@ -57,6 +55,43 @@ export default [
 
       // If we're building for production (npm run build
       // instead of npm run dev), minify
+      production && terser()
+    ]
+  },
+  {
+    input: 'node_modules/codemirror/mode/javascript/javascript.js',
+    output: {
+      sourcemap: !production,
+      format: 'iife',
+      file: 'public/vendor/codemirror/mode/javascript/javascript.js'
+    },
+    plugins: [
+      production && terser()
+    ]
+  },
+  {
+    input: 'node_modules/codemirror/lib/codemirror.js',
+    output: {
+      sourcemap: !production,
+      format: 'umd',
+      name: 'CodeMirror',
+      file: 'public/vendor/codemirror/lib/codemirror.js'
+    },
+    plugins: [
+      commonjs(),
+      production && terser()
+    ]
+  },
+  {
+    input: 'node_modules/feelin/dist/feelin.umd.js',
+    output: {
+      sourcemap: !production,
+      format: 'umd',
+      name: 'Feelin',
+      file: 'public/vendor/feelin/dist/feelin.umd.js'
+    },
+    plugins: [
+      commonjs(),
       production && terser()
     ]
   },

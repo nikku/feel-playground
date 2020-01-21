@@ -7,61 +7,72 @@ import copy from 'rollup-plugin-copy';
 
 const production = !process.env.ROLLUP_WATCH;
 
-export default {
-  input: 'src/main.js',
-  output: {
-    sourcemap: true,
-    format: 'iife',
-    name: 'app',
-    file: 'public/build/bundle.js'
+export default [
+  {
+    input: 'src/main.js',
+    output: {
+      sourcemap: !production,
+      format: 'iife',
+      name: 'app',
+      file: 'public/bundle.js'
+    },
+    plugins: [
+      svelte({
+        // enable run-time checks when not in production
+        dev: !production,
+        // we'll extract any component CSS out into
+        // a separate file — better for performance
+        css: css => {
+          css.write('public/bundle.css');
+        }
+      }),
+
+      copy({
+        targets: [
+          { src: 'src/*.{html,png,svg,json}', dest: 'public' },
+          { src: 'node_modules/codemirror/lib', dest: 'public/vendor/codemirror' },
+          { src: 'node_modules/codemirror/mode/javascript', dest: 'public/vendor/codemirror/mode' },
+          { src: 'node_modules/feelin/dist', dest: 'public/vendor/feelin' }
+        ]
+      }),
+
+      // If you have external dependencies installed from
+      // npm, you'll most likely need these plugins. In
+      // some cases you'll need additional configuration —
+      // consult the documentation for details:
+      // https://github.com/rollup/plugins/tree/master/packages/commonjs
+      resolve({
+        browser: true,
+        dedupe: importee => importee === 'svelte' || importee.startsWith('svelte/')
+      }),
+      commonjs(),
+
+      // In dev mode, call `npm run start` once
+      // the bundle has been generated
+      !production && serve(),
+
+      // Watch the `public` directory and refresh the
+      // browser on changes when not in production
+      !production && livereload('public'),
+
+      // If we're building for production (npm run build
+      // instead of npm run dev), minify
+      production && terser()
+    ]
   },
-  plugins: [
-    svelte({
-      // enable run-time checks when not in production
-      dev: !production,
-      // we'll extract any component CSS out into
-      // a separate file — better for performance
-      css: css => {
-        css.write('public/build/bundle.css');
-      }
-    }),
-
-    copy({
-      targets: [
-        { src: 'src/*.{html,png,svg}', dest: 'public' },
-        { src: 'node_modules/codemirror/lib', dest: 'public/vendor/codemirror' },
-        { src: 'node_modules/codemirror/mode/javascript', dest: 'public/vendor/codemirror/mode' },
-        { src: 'node_modules/feelin/dist', dest: 'public/vendor/feelin' }
-      ]
-    }),
-
-    // If you have external dependencies installed from
-    // npm, you'll most likely need these plugins. In
-    // some cases you'll need additional configuration —
-    // consult the documentation for details:
-    // https://github.com/rollup/plugins/tree/master/packages/commonjs
-    resolve({
-      browser: true,
-      dedupe: importee => importee === 'svelte' || importee.startsWith('svelte/')
-    }),
-    commonjs(),
-
-    // In dev mode, call `npm run start` once
-    // the bundle has been generated
-    !production && serve(),
-
-    // Watch the `public` directory and refresh the
-    // browser on changes when not in production
-    !production && livereload('public'),
-
-    // If we're building for production (npm run build
-    // instead of npm run dev), minify
-    production && terser()
-  ],
-  watch: {
-    clearScreen: false
+  {
+    input: 'src/service-worker.js',
+    output: {
+      sourcemap: !production,
+      format: 'iife',
+      name: 'appWorker',
+      file: 'public/service-worker.js'
+    },
+    plugins: [
+      production && terser()
+    ]
   }
-};
+];
 
 function serve() {
   let started = false;

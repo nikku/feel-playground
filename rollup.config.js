@@ -30,7 +30,7 @@ export default [
       copy({
         targets: [
           { src: 'src/*.{html,png,svg,json}', dest: 'public' },
-          { src: 'node_modules/codemirror/lib/*.css', dest: 'public/vendor/codemirror' }
+          { src: 'node_modules/codemirror/lib/*.css', dest: 'public/vendor/codemirror/lib' }
         ]
       }),
 

@@ -1,7 +1,6 @@
 <script>
 
-  Feelin = window.Feelin;
-  CodeMirror = window.CodeMirror;
+  /* global CodeMirror, Feelin */
 
   import TreeNode from './TreeNode.svelte';
 

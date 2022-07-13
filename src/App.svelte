@@ -1,14 +1,22 @@
 <script>
+  import JsonEditor from './editors/JsonEditor';
+  import FeelEditor from './editors/FeelEditor';
 
-  /* global CodeMirror, Feelin */
+  import {
+    evaluate as evaluateFeel,
+    parse as parseFeel
+  } from './FeelEngine';
+
+  import {
+    lintError
+  } from './editors/Linting';
 
   import TreeNode from './TreeNode.svelte';
+  import ErrorIndicator from './ErrorIndicator.svelte';
 
   import {
     debounce
   } from 'min-dash';
-
-  import { NodeProp } from 'lezer';
 
   import { onMount } from 'svelte';
 
@@ -16,27 +24,23 @@
 
   let codeEditorElement;
   let contextEditorElement;
-  let treeElement;
+  let outputElement;
 
   let codeEditor;
   let contextEditor;
+  let outputViewer;
 
-  let treeRoot = { name: 'Expression', start: 0, end: 0, children: [] };
-  let treeTokens = [];
+  let treeRoot = { name: 'Expressions', from: 0, to: 0, children: [] };
 
   let treeSelection;
 
   let feelType = params.feelType || 'expression';
 
-  let syntaxMarks = [];
-  let selectionMark;
-
-  let syntaxHighlight = params.syntaxHighlight !== 'false';
-
   let expression = params.expression || `for
   fruit in [ "apple", "bananas" ], vegetable in vegetables
 return
   { ingredients: [ fruit, vegetable ] }`;
+  let expressionErrors = [];
 
   let output = undefined;
   let outputError = null;
@@ -48,141 +52,99 @@ return
   "Mike's age": 35
 }`;
 
-  let contextParseError;
+  let contextError;
 
   onMount(() => {
-    codeEditor = CodeMirror.fromTextArea(codeEditorElement, {
-      lineNumbers: true,
-      mode: null
+    codeEditor = new FeelEditor({
+      doc: expression,
+      onChange: (doc) => expression = doc,
+      onMousemove: (position) => {
+        if (treeRoot) {
+          const newSelection = findTreeNode(position, treeRoot);
+
+          if (newSelection !== treeSelection) {
+            treeSelection = newSelection;
+          }
+        }
+      },
+      onMouseout: () => {
+        treeSelection = null;
+      },
+      parent: codeEditorElement
     });
 
-    const updateExpression = () => {
-      expression = codeEditor.getDoc().getValue();
-    };
-
-    codeEditor.on('change', updateExpression);
-
-    contextEditor = CodeMirror.fromTextArea(contextEditorElement, {
-      mode: { name: 'javascript', json: true },
-      theme: 'default'
+    contextEditor = new JsonEditor({
+      doc: contextString,
+      onChange: (doc) => contextString = doc,
+      parent: contextEditorElement
     });
 
-    const updateContext = () => {
-      contextString = contextEditor.getDoc().getValue();
-    };
-
-    contextEditor.on('change', updateContext);
+    outputViewer = new JsonEditor({
+      doc: typeof output === 'undefined' ? '' : output,
+      parent: outputElement,
+      readOnly: true
+    });
   });
+
+  $: outputViewer && outputViewer.setDoc(
+    typeof output !== 'undefined' && JSON.stringify(output, null, 2) || ''
+  );
 
   function parseParams() {
 
     const hash = window.location.hash;
 
-    const [ expression, contextString, syntaxHighlight, feelType ] = hash.slice(1).split(';').map(decodeURIComponent);
+    if (hash) {
+      const [
+        expression,
+        contextString,
+        _,
+        feelType
+      ] = hash.slice(1).split(';').map(decodeURIComponent);
+
+      return {
+        expression,
+        contextString,
+        feelType
+      };
+    }
+
+    const url = new URL(window.location.href);
 
     return {
-      expression,
-      contextString,
-      syntaxHighlight,
-      feelType
+      expression: url.searchParams.get('e'),
+      contextString: url.searchParams.get('c'),
+      feelType: url.searchParams.get('t')
     };
   }
 
-  function serializeHash(expression, contextString, syntaxHighlight, feelType) {
-    window.location.hash = '#' + [ expression, contextString, syntaxHighlight, feelType ].map(encodeURIComponent).join(';');
-  }
+  const pushParams = debounce((expression, contextString, feelType) => {
 
-  function mark(editor, node, className) {
+    const url = new URL(window.location.href);
 
-    const doc = editor.getDoc();
+    url.searchParams.set('e', expression);
+    url.searchParams.set('c', contextString);
+    url.searchParams.set('t', feelType);
+    url.hash = '';
 
-    let start = node.start;
-    let end = node.end;
-
-    let type = '';
-
-    if (start === end) {
-
-      if (start > 0) {
-        start--;
-        type = '-after';
-      } else {
-        end++;
-        type = '-before';
-      }
-    }
-
-    const startCoords = doc.posFromIndex(start);
-
-    const endCoords = doc.posFromIndex(end);
-
-    return editor.markText(
-      startCoords,
-      endCoords,
-      { className: `mark-${className}${type}` }
-    );
-  }
+    window.history.pushState({}, null, url.toString());
+  }, 300);
 
   function selectExpression(node) {
     treeSelection = node;
   }
 
-  function clearMark(mark) {
-    mark.clear();
-  }
-
-  function renderSyntax(editor, treeTokens) {
-
-    console.time('renderSyntax');
-
-    syntaxMarks.forEach(clearMark);
-
-    if (editor) {
-
-      syntaxMarks = treeTokens.reduce((marks, node) => {
-
-        marks.push(mark(editor, node, node.tokenType));
-
-        return marks;
-      }, []);
-    }
-
-    console.timeEnd('renderSyntax');
-  }
-
-  function renderSelection(editor, node) {
+  function renderSelection(codeEditor, node) {
     console.time('renderSelection');
 
-    if (selectionMark) {
-      clearMark(selectionMark);
-    }
-
-    if (node && editor) {
-      selectionMark = mark(editor, node, 'selection');
-    }
+    codeEditor && codeEditor.highlight(node);
 
     console.timeEnd('renderSelection');
   }
 
-  const handleEditorOver = function(event) {
-
-    const position = codeEditor.coordsChar({
-      left: event.clientX,
-      top: event.clientY
-    }, 'window');
-
-    const index = codeEditor.getDoc().indexFromPos(position);
-
-    const selectedNode = findTreeNode(index, treeRoot);
-
-    if (selectedNode !== treeSelection) {
-      treeSelection = selectedNode;
-    }
-  }
-
   function findTreeNode(index, treeRoot) {
 
-    if (index >= treeRoot.end || index <= treeRoot.start) {
+    if (index >= treeRoot.to || index <= treeRoot.from) {
       return null;
     }
 
@@ -193,7 +155,7 @@ return
       // find child that matches node
       for (const child of node.children) {
 
-        if (child.start <= index && child.end > index) {
+        if (child.from <= index && child.to > index) {
           if (!child.children.length) {
             return child;
           }
@@ -210,7 +172,7 @@ return
 
   }
 
-  const updateStack = debounce(function updateStack(feelType, expression, rawContext, syntaxHighlight) {
+  const updateStack = debounce(function updateStack(feelType, expression = '', rawContext) {
 
     console.time('updateStack');
 
@@ -220,36 +182,28 @@ return
       }
     ];
 
-    const tokens = [];
-
-    const parse = feelType === 'unaryTest' ? Feelin.parseUnaryTests : Feelin.parseExpressions;
-
     const {
       tree,
       parsedInput
-    } = parse(expression, rawContext);
-
-    let txt = '';
-
-    let indent = 0;
+    } = parseFeel(feelType, expression, rawContext);
 
     tree.iterate({
-      enter(node, start, end) {
+      enter(node) {
 
         const {
-          name
+          name,
+          from,
+          to
         } = node;
 
-        const parent = stack[stack.length - 1];
+        const skip = name === parsedInput.slice(from, to);
 
-        const skip = name === parsedInput.slice(start, end);
-
-        const error = node.prop(NodeProp.error);
+        const error = node.type.isError && lintError(node);
 
         const _node = {
           name,
-          start,
-          end,
+          from,
+          to,
           children: [],
           error,
           skip
@@ -262,7 +216,7 @@ return
 
       },
 
-      leave(node, start, end) {
+      leave(node) {
 
         const current = stack.pop();
 
@@ -273,15 +227,10 @@ return
         const parent = stack[stack.length - 1];
 
         parent.children.push(current);
-
-        if (syntaxHighlight && current.tokenType || current.error) {
-          tokens.push(current);
-        }
       }
     });
 
     treeRoot = stack[0].children[0];
-    treeTokens = tokens;
 
     console.timeEnd('updateStack');
   }, 300);
@@ -293,11 +242,11 @@ return
       if (typeof context !== 'object') {
         context = {};
 
-        throw new Error('expected Object literal');
+        throw new Error('Object literal expected');
       }
-      contextParseError = null;
+      contextError = null;
     } catch (err) {
-      contextParseError = err;
+      contextError = err;
     }
   }, 300);
 
@@ -367,12 +316,10 @@ return
 
   }
 
-  const evaluateExpression = debounce(function evaluateExpression(feelType, expression, context) {
-
-    const evaluate = feelType === 'unaryTest' ? Feelin.unaryTest : Feelin.evaluate;
+  const evaluateExpression = debounce((feelType, expression, context) => {
 
     try {
-      output = evaluate(expression, context);
+      output = evaluateFeel(feelType, expression, context);
       outputError = null;
     } catch (err) {
       console.error(err);
@@ -382,17 +329,21 @@ return
     }
   }, 300);
 
+  function setDialect(codeEditor, feelType) {
+    codeEditor && codeEditor.setDialect(feelType);
+  }
+
+  $: setDialect(codeEditor, feelType);
+
   $: parseContext(contextString);
 
-  $: expression !== undefined && updateStack(feelType, expression, context, syntaxHighlight);
+  $: updateStack(feelType, expression, context);
 
   $: evaluateExpression(feelType, expression, context);
 
   $: renderSelection(codeEditor, treeSelection);
 
-  $: renderSyntax(codeEditor, treeTokens);
-
-  $: serializeHash(expression, contextString, syntaxHighlight, feelType);
+  $: pushParams(expression, contextString, feelType);
 </script>
 
 <main class="vcontainer">
@@ -420,22 +371,25 @@ return
 
   <div class="views hcontainer">
 
-    <div class="vcontainer" style="flex: .6">
+    <div class="vcontainer" style="flex: 1">
 
       <div class="container code-editor">
         <h3 class="legend">
-          Code <select class="typeselect" name="feelType" bind:value={ feelType }>
+          Code
+
+          <select class="typeselect" name="feelType" bind:value={ feelType }>
             <option value="expression">Expression</option>
             <option value="unaryTest">Unary Test</option>
           </select>
 
-          <span class="right">
-            <label><input type="checkbox" bind:checked={ syntaxHighlight }> Syntax highlight</label>
-          </span>
+          {#if expressionErrors.length }
+            <div class="error">
+              <ErrorIndicator error={ expressionErrors[0] } />
+            </div>
+          {/if}
         </h3>
 
-        <div class:highlight-container={ syntaxHighlight } class="content" on:mousemove={ handleEditorOver }>
-          <textarea name="expression" bind:this={ codeEditorElement } bind:value={ expression }></textarea>
+        <div class="content" bind:this={ codeEditorElement }>
         </div>
 
       </div>
@@ -445,50 +399,82 @@ return
 
           <h3 class="legend">
             Input
+
+            {#if contextError }
+              <div class="error">
+                <ErrorIndicator error={ contextError } />
+              </div>
+            {/if}
+
           </h3>
 
-          <div class="content">
-            <textarea name="contextString" bind:this={ contextEditorElement } bind:value={ contextString }></textarea>
+          <div
+            class="content"
+            bind:this={ contextEditorElement }
+            class:with-error={ contextError }
+          ></div>
+
+          {#if contextError}
+            <div class="note error-note">
+              { contextError.message }.
+            </div>
+          {/if}
+
+          <div class="note">
+            Define your input variables as a JSON object literal.
           </div>
 
-          <div class="note" class:error-note={ contextParseError } >
-            {#if contextParseError}
-              Failed to parse as JSON.
-            {:else}
-              Enter JSON object literal.
-              {#if feelType === 'unaryTest'}
-                Input named <code>?</code> is treated as value to test.
-              {/if}
-            {/if}
-          </div>
+          {#if feelType === 'unaryTest'}
+            <div class="note">
+              Input <b><code>?</code></b> is treated as value to test.
+            </div>
+          {/if}
         </div>
 
         <div class="container output">
 
           <h3 class="legend">
             Output
+
+            {#if outputError }
+              <div class="error">
+                <ErrorIndicator error={ outputError } />
+              </div>
+            {/if}
           </h3>
 
-          <div class="content">{ typeof output !== 'undefined' && JSON.stringify(output, 0, 2) || '' }</div>
+          <div class="content"
+               bind:this={ outputElement }
+               class:with-error={ outputError }
+          ></div>
 
-          <div class="note" class:error-note={ outputError }>
-            {#if outputError}
-              Evaluation failed: { outputError.message }
-            {:else}
-              Change code or input to re-compute output.
-            {/if}
+
+          {#if outputError}
+            <div class="note error-note">
+              Evaluation error: { outputError.message }
+            </div>
+          {/if}
+
+          <div class="note">
+            Re-computes automatically once you change code or input.
           </div>
         </div>
       </div>
     </div>
 
-    <div class="container tree" style="flex: .4">
+    <div class="container tree" style="flex: 0.5; min-width: 300px;">
 
       <h3 class="legend">
         Tree
+
+        {#if expressionErrors.length }
+          <div class="error">
+            <ErrorIndicator error={ expressionErrors[0] } />
+          </div>
+        {/if}
       </h3>
 
-      <div class="content">
+      <div class="content" class:with-error={ expressionErrors.length }>
         <TreeNode node={ treeRoot } selection={ treeSelection } onSelect={ selectExpression } />
       </div>
     </div>
@@ -498,6 +484,11 @@ return
 </main>
 
 <style>
+
+  main {
+    --color-error-fg: white;
+    --color-error-bg: #d11;
+  }
 
   :global(*) {
     box-sizing: border-box;
@@ -554,7 +545,8 @@ return
 
   .note {
     font-size: .9em;
-    margin-top: 7px;
+    line-height: 1.3;
+    margin-top: .5em;
     color: #666;
   }
 
@@ -562,8 +554,18 @@ return
     font-weight: bold;
   }
 
+  .content.with-error {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
   .error-note {
-    color: red;
+    background: var(--color-error-bg);
+    color: var(--color-error-fg);
+    padding: .5em .75em;
+    margin-top: 0;
+    border-radius: 0 0 3px 3px;
+    font-family: monospace;
   }
 
   .typeselect {
@@ -612,8 +614,8 @@ return
     align-self: stretch;
   }
 
-  .legend .right {
-    flex-grow: 1;
+  .legend .error {
+    flex: 1;
     text-align: right;
   }
 
@@ -626,11 +628,6 @@ return
     align-items: center;
     padding: 0;
     line-height: 2em;
-  }
-
-  .legend label {
-    font-weight: normal;
-    font-size: .90em;
   }
 
   select {
@@ -648,96 +645,30 @@ return
   }
 
   .code-editor .content,
-  .context-editor .content {
+  .context-editor .content,
+  .output .content {
     overflow: hidden;
   }
 
   .tree .content {
     overflow: auto;
     padding: 4px;
-    min-width: 200px;
+    width: 100%;
   }
 
-  .output .content {
-    white-space: pre-wrap;
-    font-family: monospace;
-    padding: 4px;
-    overflow: auto;
-  }
-
-  :global(.CodeMirror) {
+  :global(.cm-editor) {
     height: 100%;
   }
 
-  :global(.highlight-container .CodeMirror-code) {
-    color: #708;
-  }
-
-  :global(.mark-comment) {
-    color: #a50;
-  }
-
-  :global(.mark-selection) {
+  :global(.cm-highlight) {
     background: bisque;
   }
 
-  :global(.mark-parameters),
-  :global(.mark-context),
-  :global(.mark-list),
-  :global(.mark-interval) {
-    color: rgb(67, 79, 84);
-  }
-
-  :global(.mark-string) {
-    color: #a11;
-  }
-
-  :global(.mark-builtin) {
-    color: #30a;
-  }
-
-  :global(.mark-number) {
-    color: #164;
-  }
-
-  :global(.mark-boolean) {
-    color: #219;
-  }
-
-  :global(.mark-qname) {
-    color: #05a;
-  }
-
-  :global(.mark-name) {
-    color: #05a;
-  }
-
-  :global(.mark-error) {
-    text-decoration: underline;
-    color: red;
-  }
-
-  :global(.mark-error-before) {
-    position: relative;
-  }
-
-  :global(.mark-error-before):before {
-    position: absolute;
-    z-index: 300;
-    content: '\200B';
-    border-left: dotted 1px red;
-    margin-left: -1px;
-  }
-
-  :global(.mark-error-after) {
-    position: relative;
-  }
-
-  :global(.mark-error-after):after {
-    position: absolute;
-    z-index: 300;
-    content: '\200B';
-    border-right: dotted 1px red;
-    margin-right: -1px;
+  :global(.cm-lintPoint):after {
+    left: -3px !important;
+    border-left: 5px solid transparent !important;
+    border-right: 5px solid transparent !important;
+    border-bottom: 5px solid #d11 !important;
+    bottom: -3px !important;
   }
 </style>

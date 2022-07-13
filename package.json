@@ -4,13 +4,16 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public"
+    "start": "sirv public",
+    "lint": "eslint . --ext js,svelte"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.0.1",
-    "codemirror": "^5.50.2",
-    "feelin": "^0.20.0",
+    "eslint": "^8.19.0",
+    "eslint-plugin-bpmn-io": "^0.14.0",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "feelin": "^0.26.0",
     "min-dash": "^3.5.2",
     "rollup": "^2.35.1",
     "rollup-plugin-copy": "^3.3.0",
@@ -21,6 +24,16 @@
     "svelte": "^3.31.1"
   },
   "dependencies": {
+    "@codemirror/autocomplete": "^6.0.4",
+    "@codemirror/commands": "^6.0.1",
+    "@codemirror/lang-json": "^6.0.0",
+    "@codemirror/language": "^6.2.0",
+    "@codemirror/lint": "^6.0.0",
+    "@codemirror/search": "^6.0.0",
+    "@codemirror/state": "^6.1.0",
+    "@codemirror/view": "^6.0.3",
+    "@lezer/highlight": "^1.0.0",
+    "lezer-feel": "^0.6.0",
     "sirv-cli": "^1.0.10"
   }
 }

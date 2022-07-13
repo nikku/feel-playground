@@ -20,6 +20,7 @@ export default [
     plugins: [
       svelte({
         compilerOptions: {
+
           // enable run-time checks when not in production
           dev: !production
         }
@@ -31,14 +32,13 @@ export default [
 
       copy({
         targets: [
-          { src: 'src/*.{html,png,svg,json}', dest: 'public' },
-          { src: 'node_modules/codemirror/lib/*.css', dest: 'public/vendor/codemirror/lib' }
+          { src: 'src/*.{html,png,svg,json}', dest: 'public' }
         ]
       }),
 
       resolve({
         browser: true,
-        dedupe: ['svelte']
+        dedupe: [ 'svelte' ]
       }),
       commonjs(),
 
@@ -52,43 +52,6 @@ export default [
 
       // If we're building for production (npm run build
       // instead of npm run dev), minify
-      production && terser()
-    ]
-  },
-  {
-    input: 'node_modules/codemirror/mode/javascript/javascript.js',
-    output: {
-      sourcemap: !production,
-      format: 'iife',
-      file: 'public/vendor/codemirror/mode/javascript/javascript.js'
-    },
-    plugins: [
-      production && terser()
-    ]
-  },
-  {
-    input: 'node_modules/codemirror/lib/codemirror.js',
-    output: {
-      sourcemap: !production,
-      format: 'umd',
-      name: 'CodeMirror',
-      file: 'public/vendor/codemirror/lib/codemirror.js'
-    },
-    plugins: [
-      commonjs(),
-      production && terser()
-    ]
-  },
-  {
-    input: 'node_modules/feelin/dist/feelin.umd.js',
-    output: {
-      sourcemap: !production,
-      format: 'umd',
-      name: 'Feelin',
-      file: 'public/vendor/feelin/dist/feelin.umd.js'
-    },
-    plugins: [
-      commonjs(),
       production && terser()
     ]
   },
@@ -116,8 +79,8 @@ function serve() {
   return {
     writeBundle() {
       if (server) return;
-      server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
-        stdio: ['ignore', 'inherit', 'inherit'],
+      server = require('child_process').spawn('npm', [ 'run', 'start', '--', '--dev' ], {
+        stdio: [ 'ignore', 'inherit', 'inherit' ],
         shell: true
       });
 

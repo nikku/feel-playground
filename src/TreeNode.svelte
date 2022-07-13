@@ -1,6 +1,15 @@
 <script>
   import { afterUpdate } from 'svelte';
 
+  /**
+   * @type { {
+   *   name: string,
+   *   from: number,
+   *   to: number,
+   *   error: boolean,
+   *   children: Node[]
+   * } } Node
+   */
   export let node;
 
   export let onSelect;
@@ -24,10 +33,10 @@
   });
 </script>
 
-<div class="node" bind:this={ el } class:selected={ selected} on:mouseover={ handleSelect }>
+<div class="node" bind:this={ el } class:selected={ selected } on:mouseover={ handleSelect }>
 
   <div class="description">
-    <span class:error={ node.error } class="name">{ node.error ? 'ERROR' : node.name }</span> [ { node.start }, { node.end } ]
+    <span class:error={ node.error } class="name" title={ node.error && node.error.message }>{ node.error ? 'ERROR' : node.name }</span> [ { node.from }, { node.to } ]
   </div>
 
   {#if node.children.length}

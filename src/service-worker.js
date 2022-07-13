@@ -93,8 +93,6 @@ self.addEventListener('fetch', function(event) {
 
   const { request } = event;
 
-  const { url } = request;
-
   const remoteFetch = fromNetwork(event, request);
 
   event.respondWith(

@@ -349,22 +349,22 @@ return
 <main class="vcontainer">
   <header class="hcontainer">
 
-    <a href="/" class="logo">
-      <img alt="F" src="logo.svg" />
-    </a>
+    <div class="app-title">
+      <a href="/" class="app-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22.962 22.962"><path d="M5 0h12.962c2.77 0 5 2.23 5 5v12.962c0 2.77-2.23 5-5 5H5c-2.77 0-5-2.23-5-5V5c0-2.77 2.23-5 5-5z" fill="#4682b4"/><path d="M5.664 15.22q-.579-.329-.888-.927-.308-.598-.347-1.138.058-.463.25-.714.175-.27.425-.424.251-.174.521-.25.27-.097.521-.155l.29.096q.096.097.192.174.116.077.213.154.193-.077.231-.231l.116-.309q.058-.212.135-.424.077-.213.193-.425-.02-.174.02-.309.038-.135.076-.231-.115-.097-.173-.097-.039-.019-.155-.057H7.17q-.058-.02-.135-.039-.29-.212-.386-.347-.077-.155-.174-.309-.096-.154-.173-.27-.078-.116-.174-.212l-.232-.155.116-.231q.039-.039.039-.097 0-.077-.077-.212-.058-.25-.02-.366l.039-.232q.193-.25.212-.29l.193-.192q.444-.116.907-.251.463-.154.906-.309.444-.154.907-.308.463-.155.926-.27.155-.135.328-.155.193-.038.347-.058.136 0 .251-.019.116-.02.174-.096.328-.116.637-.193.578-.155 1.524-.367.945-.212 2.122-.309l.405-.019q.116.02.232.02.115-.02.231-.02 1.003 0 1.331.618.193.096.347.25.155.135.29.27l.174.174q.077.058.135.096l.154.155q.212.463.077.907-.116.231-.25.27l-.27.077-.252.135q-.25-.02-.385-.02h-.27q-.58 0-1.351.078-.752.058-1.543.193-.791.115-1.544.308-.752.174-1.312.386-.154.116-.405.212-.058.02-.174.097.02.154 0 .309-.019.135-.057.27-.02.096-.039.212 0 .096-.02.212-.404.482-.385 1.138l-.097.193q-.077.077-.135.232-.038.135 0 .29l.078.23.752-.076q.386-.058.81-.116.54-.097 1.08-.155.56-.077 1.158-.077h.753l-.174.174.212.02-.116.308q.135.058.193.096.077.02.135.058l.135.193q.097.058.174.193.077.116.097.328l-.058.193-.907 1.158-.116.154-.193-.058q-.366-.02-.694.077-.155.039-.328.097-.174.038-.348.038-.463.077-.771.135l-.618.077q-.424.078-.83.155-.385.058-.732.193-.213.019-.251.019-.039-.02-.077-.02-.193 0-.386.059-.193.057-.367.115-.115.097-.154.213-.039.096-.077.212-.039.135-.116.27-.058.116-.154.25l.019.348q-.174.038-.174.058H8.25q0 .154-.058.29-.038.134-.077.25-.039.077-.058.135-.02.058-.02.116.194.347.097.79-.077.367-.29.657-.211.27-.5.424-.31.039-.464-.02-.135-.057-.29-.115-.096-.038-.192-.058-.097-.038-.193-.058l-.231-.193q-.058-.115-.136-.212l-.154-.231-.193-.27q-.096-.135-.173-.31-.135-.674-.058-1.118.096-.463.25-.907.04-.154.078-.29.038-.134.077-.289z" aria-label="F" fill="#fff" stroke-width=".265"/></svg>
+      </a>
 
-    <span style="
-        font-weight: bold;
-        font-size: 1.2em;
-        color: steelblue;
-        margin-left: 2px;
-    "><span aria-hidden="false" style="
-        display: none;
-    ">F</span>eel Playground</span>
+      <span class="app-name"><span aria-hidden="false" style="display: none;">F</span>EEL Playground</span>
+    </div>
+
+    <div class="spacer"></div>
 
     <div class="menu">
-      <a href="https://github.com/nikku/feel-playground/issues">Report an Issue</a> ·
-      <a href="https://github.com/nikku/feel-playground">View on GitHub</a>
+      <a class="btn btn-feel item" href="https://github.com/nikku/feel-playground/issues" >Report issue</a>
+
+      <a class="btn item" href="https://github.com/nikku/feel-playground">
+        View on GitHub
+      </a>
     </div>
 
   </header>
@@ -517,20 +517,29 @@ return
     align-items: center;
   }
 
-  .logo {
-    margin: 0;
-    display: block;
+  .app-logo svg {
     height: 26px;
+    vertical-align: bottom;
   }
 
-  .logo img {
-    height: 100%;
+  .app-name {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: steelblue;
+    margin-left: -.1rem;
   }
 
-  .menu {
-    line-height: 32px;
-    flex-grow: 1;
-    text-align: right;
+  header .spacer {
+    flex: 1;
+  }
+
+  header .menu {
+    display: flex;
+    align-items: center;
+  }
+
+  header .menu .item + .item {
+    margin-left: 1em;
   }
 
   main {
@@ -579,9 +588,33 @@ return
     background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right .75rem center/8px 10px;
     border: 1px solid #ced4da;
     border-radius: .25rem;
-    -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: .275rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.3;
+    color: #495057;
+    border: 1px solid #999;
+    border-radius: .25rem;
+  }
+
+  a.btn {
+    text-decoration: none;
+  }
+
+  .btn-feel {
+    color: steelblue;
+    border-color: steelblue;
+  }
+
+  .btn:hover {
+    background: #F0F0F0;
+    border-color: #999;
+    color: #333;
   }
 
   .hcontainer,

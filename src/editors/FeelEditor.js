@@ -128,12 +128,19 @@ FeelEditor.prototype.setDialect = function(feelType) {
     return;
   }
 
+  const doc = this._cm.state.doc;
+
   this._cm.dispatch({
     effects: this._languageConfig.reconfigure(
       feelType === 'unaryTest'
         ? feelUnaryTests()
         : feelExpressions()
-    )
+    ),
+    changes: {
+      from: 0,
+      to: doc.length,
+      insert: doc
+    }
   });
 };
 

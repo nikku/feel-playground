@@ -456,7 +456,7 @@ return
           {/if}
 
           <div class="note">
-            Re-computes automatically once you change code or input.
+            Re-computes once you change code or input.
           </div>
         </div>
       </div>

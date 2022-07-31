@@ -1,6 +1,5 @@
 import {
-  LanguageSupport,
-  language
+  LanguageSupport
 } from '@codemirror/language';
 
 import {

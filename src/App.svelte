@@ -231,7 +231,7 @@ return
     treeRoot = stack[0].children[0];
 
     console.timeEnd('updateStack');
-  }, 300);
+  }, 0);
 
   const parseContext = debounce(function parseContext(contextString) {
     try {
@@ -246,7 +246,7 @@ return
     } catch (err) {
       contextError = err;
     }
-  }, 300);
+  }, 0);
 
   const evaluateExpression = debounce((dialect, expression, context) => {
 
@@ -259,7 +259,7 @@ return
       output = undefined;
       outputError = err;
     }
-  }, 300);
+  }, 0);
 
   function setDialect(codeEditor, dialect) {
     codeEditor && codeEditor.setDialect(dialect);

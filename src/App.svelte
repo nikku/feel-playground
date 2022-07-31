@@ -69,9 +69,6 @@ return
           }
         }
       },
-      onMouseout: () => {
-        treeSelection = null;
-      },
       parent: codeEditorElement
     });
 

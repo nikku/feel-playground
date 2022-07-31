@@ -24,17 +24,23 @@ const highlightField = StateField.define({
   },
   update(highlights, tr) {
     highlights = highlights.map(tr.changes);
-    for (let e of tr.effects) {
-      if (e.is(addHighlight)) {
-        highlights = highlights.update({
-          filter: () => false,
-          add: [ highlightMark.range(e.value.from, e.value.to) ]
-        });
-      }
+
+    const highlightMarks = tr.effects.filter(
+      effect => effect.is(addHighlight)
+    ).map(
+      effect => effect.value && highlightMark.range(effect.value.from, effect.value.to)
+    );
+
+    if (highlightMarks.length) {
+      highlights = highlights.update({
+        filter: () => false,
+        add: highlightMarks.filter(m => m)
+      });
     }
+
     return highlights;
   },
-  provide: f => EditorView.decorations.from(f)
+  provide: field => EditorView.decorations.from(field)
 });
 
 const highlightTheme = EditorView.baseTheme({
@@ -51,6 +57,8 @@ export function highlightSelection(view, range) {
 
   if (range) {
     effects.push(addHighlight.of(range));
+  } else {
+    effects.push(addHighlight.of(null));
   }
 
   if (!view.state.field(highlightField, false)) {

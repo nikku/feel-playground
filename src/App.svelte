@@ -34,7 +34,7 @@
 
   let treeSelection;
 
-  let feelType = params.feelType || 'expression';
+  let dialect = params.dialect || 'expression';
 
   let expression = params.expression || `for
   fruit in [ "apple", "bananas" ], vegetable in vegetables
@@ -57,6 +57,8 @@ return
   onMount(() => {
     codeEditor = new FeelEditor({
       doc: expression,
+      context,
+      dialect,
       onChange: (doc) => expression = doc,
       onMousemove: (position) => {
         if (treeRoot) {
@@ -99,13 +101,13 @@ return
         expression,
         contextString,
         _,
-        feelType
+        dialect
       ] = hash.slice(1).split(';').map(decodeURIComponent);
 
       return {
         expression,
         contextString,
-        feelType
+        dialect
       };
     }
 
@@ -114,17 +116,17 @@ return
     return {
       expression: url.searchParams.get('e'),
       contextString: url.searchParams.get('c'),
-      feelType: url.searchParams.get('t')
+      dialect: url.searchParams.get('t')
     };
   }
 
-  const pushParams = debounce((expression, contextString, feelType) => {
+  const pushParams = debounce((expression, contextString, dialect) => {
 
     const url = new URL(window.location.href);
 
     url.searchParams.set('e', expression);
     url.searchParams.set('c', contextString);
-    url.searchParams.set('t', feelType);
+    url.searchParams.set('t', dialect);
     url.hash = '';
 
     window.history.pushState({}, null, url.toString());
@@ -172,7 +174,7 @@ return
 
   }
 
-  const updateStack = debounce(function updateStack(feelType, expression = '', rawContext) {
+  const updateStack = debounce(function updateStack(dialect, expression = '', context) {
 
     console.time('updateStack');
 
@@ -182,10 +184,7 @@ return
       }
     ];
 
-    const {
-      tree,
-      parsedInput
-    } = parseFeel(feelType, expression, rawContext);
+    const tree = parseFeel(dialect, expression, context);
 
     tree.iterate({
       enter(node) {
@@ -196,7 +195,10 @@ return
           to
         } = node;
 
-        const skip = name === parsedInput.slice(from, to);
+        const skip = (
+          name === expression.slice(from, to)
+            || name === 'Identifier'
+        );
 
         const error = node.type.isError && lintError(node);
 
@@ -210,8 +212,7 @@ return
         };
 
         stack.push({
-          ..._node,
-          tokenType: getTokenType(_node)
+          ..._node
         });
 
       },
@@ -250,76 +251,10 @@ return
     }
   }, 300);
 
-  function getTokenType(node) {
-
-    const {
-      name,
-      error
-    } = node;
-
-    if (error) {
-      return 'error';
-    }
-
-    if (name === 'BuiltInFunctionName') {
-      return 'builtin';
-    }
-
-    if (
-      name === 'BuiltInType' ||
-      name === 'ListType' ||
-      name === 'ContextType' ||
-      name === 'FunctionType'
-    ) {
-      return 'builtin';
-    }
-
-    if (name === 'BlockComment' || name === 'LineComment') {
-      return 'comment';
-    }
-
-    if (name === 'Parameters') {
-      return 'parameters';
-    }
-
-    if (name === 'List') {
-      return 'list';
-    }
-
-    if (name === 'Context') {
-      return 'context';
-    }
-
-    if (name === 'Interval') {
-      return 'interval';
-    }
-
-    if (name === 'StringLiteral') {
-      return 'string';
-    }
-
-    if (name === 'NumericLiteral') {
-      return 'number';
-    }
-
-    if (name === 'BooleanLiteral') {
-      return 'boolean';
-    }
-
-    if (name === 'QualifiedName') {
-      return 'qname';
-    }
-
-    if (name === 'Name') {
-      return 'name';
-    }
-
-  }
-
-  const evaluateExpression = debounce((feelType, expression, context) => {
+  const evaluateExpression = debounce((dialect, expression, context) => {
 
     try {
-      output = evaluateFeel(feelType, expression, context);
+      output = evaluateFeel(dialect, expression, context);
       outputError = null;
     } catch (err) {
       console.error(err);
@@ -329,21 +264,27 @@ return
     }
   }, 300);
 
-  function setDialect(codeEditor, feelType) {
-    codeEditor && codeEditor.setDialect(feelType);
+  function setDialect(codeEditor, dialect) {
+    codeEditor && codeEditor.setDialect(dialect);
   }
 
-  $: setDialect(codeEditor, feelType);
+  function setContext(codeEditor, context) {
+    codeEditor && codeEditor.setContext(context);
+  }
+
+  $: setDialect(codeEditor, dialect);
+
+  $: setContext(codeEditor, context);
 
   $: parseContext(contextString);
 
-  $: updateStack(feelType, expression, context);
+  $: updateStack(dialect, expression, context);
 
-  $: evaluateExpression(feelType, expression, context);
+  $: evaluateExpression(dialect, expression, context);
 
   $: renderSelection(codeEditor, treeSelection);
 
-  $: pushParams(expression, contextString, feelType);
+  $: pushParams(expression, contextString, dialect);
 </script>
 
 <main class="vcontainer">
@@ -377,7 +318,7 @@ return
         <h3 class="legend">
           Code
 
-          <select class="typeselect" name="feelType" bind:value={ feelType }>
+          <select class="typeselect" name="dialect" bind:value={ dialect }>
             <option value="expression">Expression</option>
             <option value="unaryTest">Unary Test</option>
           </select>
@@ -424,7 +365,7 @@ return
             Define your input variables as a JSON object literal.
           </div>
 
-          {#if feelType === 'unaryTest'}
+          {#if dialect === 'unaryTest'}
             <div class="note">
               Input <b><code>?</code></b> is treated as value to test.
             </div>

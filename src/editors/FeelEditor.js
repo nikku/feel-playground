@@ -9,7 +9,7 @@ import {
 
 import { LRLanguage, syntaxTree } from '@codemirror/language';
 
-import { parser, feelHighlighting } from 'lezer-feel';
+import { parser, trackVariables } from 'lezer-feel';
 
 import { highlightSelection } from './Highlight';
 import { feelLinter } from './Linting';
@@ -24,31 +24,21 @@ import {
 } from './BaseEditor';
 
 
-const ExpressionsLanguage = LRLanguage.define({
-  parser: parser.configure({
-    top: 'Expressions',
-    props: [
-      feelHighlighting
-    ]
-  })
-});
+function feelLanguage(dialect, context) {
 
-const UnaryTestLanguage = LRLanguage.define({
-  parser: parser.configure({
-    top: 'UnaryTests',
-    props: [
-      feelHighlighting
-    ]
-  })
-});
+  const top = dialect === 'unaryTest' ? 'UnaryTests' : 'Expressions';
+  const contextTracker = trackVariables(context);
 
-function feelExpressions() {
-  return new LanguageSupport(ExpressionsLanguage, [ ]);
+  const FeelLanguage = LRLanguage.define({
+    parser: parser.configure({
+      contextTracker,
+      top
+    })
+  });
+
+  return new LanguageSupport(FeelLanguage, [ ]);
 }
 
-function feelUnaryTests() {
-  return new LanguageSupport(UnaryTestLanguage, [ ]);
-}
 
 /**
  * @param { {
@@ -63,6 +53,8 @@ function feelUnaryTests() {
 export default function FeelEditor({
   doc = '',
   parent,
+  context = {},
+  dialect = 'expression',
   readOnly = false,
   onChange,
   onMousemove,
@@ -72,7 +64,7 @@ export default function FeelEditor({
   const languageConfig = new Compartment();
 
   const extensions = [
-    languageConfig.of(feelExpressions())
+    languageConfig.of(feelLanguage(dialect, context))
   ];
 
   if (onMousemove || onMouseout) {
@@ -104,6 +96,9 @@ export default function FeelEditor({
 
   this._languageConfig = languageConfig;
 
+  this._dialect = dialect;
+  this._context = context;
+
   return this;
 }
 
@@ -118,23 +113,28 @@ FeelEditor.prototype.highlight = function(range) {
   highlightSelection(this._cm, range);
 };
 
-FeelEditor.prototype.setDialect = function(feelType) {
+FeelEditor.prototype.setDialect = function(dialect) {
+  this._configureLanguage(dialect, this._context);
+};
 
-  var targetLanguage = feelType === 'unaryTest'
-    ? UnaryTestLanguage
-    : ExpressionsLanguage;
+FeelEditor.prototype.setContext = function(context) {
+  this._configureLanguage(this._dialect, context);
+};
 
-  if (this._cm.state.facet(language) == targetLanguage) {
+FeelEditor.prototype._configureLanguage = function(dialect, context) {
+
+  if (dialect === this._dialect && context === this._context) {
     return;
   }
 
   const doc = this._cm.state.doc;
 
+  this._dialect = dialect;
+  this._context = context;
+
   this._cm.dispatch({
     effects: this._languageConfig.reconfigure(
-      feelType === 'unaryTest'
-        ? feelUnaryTests()
-        : feelExpressions()
+      feelLanguage(dialect, context)
     ),
     changes: {
       from: 0,

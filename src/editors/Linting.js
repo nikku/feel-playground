@@ -63,10 +63,12 @@ export function lintError(nodeRef) {
       message: `Unrecognized token <${next.name}> in <${parent.name}>`
     };
   } else {
+    const unfinished = parent.enterUnfinishedNodesBefore(nodeRef.to);
+
     return {
       from: node.from,
       to: node.to,
-      message: `Incomplete <${parent.name}>`
+      message: `Incomplete <${ (unfinished || parent).name }>`
     };
   }
 }

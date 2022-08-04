@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/nikku/feel-playground/actions/workflows/CI.yml/badge.svg)](https://github.com/nikku/feel-playground/actions/workflows/CI.yml)
 
-An interactive app to try out and learn the [DMN](https://www.omg.org/dmn/) FEEL language in your browser. 
+An interactive app to learn the [DMN](https://www.omg.org/dmn/) FEEL language in your browser. 
 :arrow_right: [**Try it out**](https://nikku.github.io/feel-playground).
 
 
@@ -22,5 +22,5 @@ npm run all
 
 ## Related
 
-* [Feelin](https://github.com/nikku/feelin) - a FEEL parser and interpreter for JavaScript
-* [lezer-feel](https://github.com/nikku/lezer-feel) - a FEEL language definition for the [Lezer](https://lezer.codemirror.net/) parser system 
+* [feelin](https://github.com/nikku/feelin) - FEEL parser and interpreter for JavaScript
+* [lezer-feel](https://github.com/nikku/lezer-feel) - FEEL language definition for the [Lezer](https://lezer.codemirror.net/) parser system 

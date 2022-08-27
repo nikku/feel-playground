@@ -1,12 +1,13 @@
 import {
-  LanguageSupport
+  LanguageSupport,
+  LRLanguage,
+  foldNodeProp
 } from '@codemirror/language';
 
 import {
   Compartment
 } from '@codemirror/state';
 
-import { LRLanguage, syntaxTree } from '@codemirror/language';
 
 import { parser, trackVariables } from 'lezer-feel';
 
@@ -31,6 +32,42 @@ function feelLanguage(dialect, context) {
   const FeelLanguage = LRLanguage.define({
     parser: parser.configure({
       contextTracker,
+      props: [
+        foldNodeProp.add({
+          Context(node) {
+            const first = node.firstChild;
+            const last = node.lastChild;
+
+            if (!first || first.name != '{') return null;
+
+            return {
+              from: first.to,
+              to: last.name == '}' ? last.from : node.to
+            };
+          },
+          List(node) {
+            const first = node.firstChild;
+            const last = node.lastChild;
+
+            if (!first || first.name != '[') return null;
+
+            return {
+              from: first.to,
+              to: last.name == ']' ? last.from : node.to
+            };
+          },
+          FunctionDefinition(node) {
+            const last = node.getChild(')');
+
+            if (!last) return null;
+
+            return {
+              from: last.to,
+              to: node.to
+            };
+          }
+        })
+      ],
       top
     }),
     languageData: {

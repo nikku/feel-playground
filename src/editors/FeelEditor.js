@@ -1,7 +1,8 @@
 import {
   LanguageSupport,
   LRLanguage,
-  foldNodeProp
+  foldNodeProp,
+  indentNodeProp
 } from '@codemirror/language';
 
 import {
@@ -33,6 +34,18 @@ function feelLanguage(dialect, context) {
     parser: parser.configure({
       contextTracker,
       props: [
+        indentNodeProp.add({
+          'Context List': (context) => {
+            return context.lineIndent(context.node.from) + context.unit;
+          },
+          'ForExpression QuantifiedExpression IfExpression'(context) {
+            if (/^\s*(then|else|return|satisfies)/.test(context.textAfter)) {
+              return context.lineIndent(context.node.from);
+            } else {
+              return context.lineIndent(context.node.from) + context.unit;
+            }
+          }
+        }),
         foldNodeProp.add({
           Context(node) {
             const first = node.firstChild;

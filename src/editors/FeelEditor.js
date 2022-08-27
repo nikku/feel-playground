@@ -26,6 +26,23 @@ import {
   basicViewer
 } from './BaseEditor';
 
+/**
+ * @param { string } close
+ *
+ * @return { (context: import('@codemirror/language').TreeIndentContext) => number } indenter
+ */
+function indentInside(close) {
+
+  return (context) => {
+    const indent = context.lineIndent(context.node.from);
+
+    if (context.textAfter.trimStart().startsWith(close)) {
+      return indent;
+    } else {
+      return indent + context.unit;
+    }
+  };
+}
 
 function feelLanguage(dialect, context) {
 
@@ -37,24 +54,9 @@ function feelLanguage(dialect, context) {
       contextTracker,
       props: [
         indentNodeProp.add({
-          'Context': (context) => {
-            const indent = context.lineIndent(context.node.from);
-
-            if (/^\s*\}/.test(context.textAfter)) {
-              return indent;
-            } else {
-              return indent + context.unit;
-            }
-          },
-          'List': (context) => {
-            const indent = context.lineIndent(context.node.from);
-
-            if (/^\s*\]/.test(context.textAfter)) {
-              return indent;
-            } else {
-              return indent + context.unit;
-            }
-          },
+          'Context': indentInside('}'),
+          'List FilterExpression': indentInside(']'),
+          'FunctionInvocation ParenthesizedExpression': indentInside(')'),
           'ForExpression QuantifiedExpression IfExpression'(context) {
             if (/^\s*(then|else|return|satisfies)/.test(context.textAfter)) {
               return context.lineIndent(context.node.from);

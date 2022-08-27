@@ -32,7 +32,16 @@ function feelLanguage(dialect, context) {
     parser: parser.configure({
       contextTracker,
       top
-    })
+    }),
+    languageData: {
+      commentTokens: {
+        line: '//',
+        block: {
+          open: '/*',
+          close: '*/'
+        }
+      }
+    }
   });
 
   return new LanguageSupport(FeelLanguage, [ ]);

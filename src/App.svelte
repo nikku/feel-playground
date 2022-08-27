@@ -193,7 +193,7 @@ return
         } = node;
 
         const skip = (
-          name === expression.slice(from, to)
+          (name === expression.slice(from, to) && name !== 'null')
             || name === 'Identifier'
         );
 

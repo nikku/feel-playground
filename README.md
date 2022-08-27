@@ -23,4 +23,5 @@ npm run all
 ## Related
 
 * [feelin](https://github.com/nikku/feelin) - FEEL parser and interpreter for JavaScript
-* [lezer-feel](https://github.com/nikku/lezer-feel) - FEEL language definition for the [Lezer](https://lezer.codemirror.net/) parser system 
+* [lezer-feel](https://github.com/nikku/lezer-feel) - FEEL grammar for the [Lezer](https://lezer.codemirror.net/) parser system
+* [lang-feel](https://github.com/nikku/lang-feel) - FEEL language definition for the [CodeMirror](https://codemirror.net/) code editor

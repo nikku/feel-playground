@@ -364,7 +364,7 @@ return
 
           {#if dialect === 'unaryTest'}
             <div class="note">
-              Input <b><code>?</code></b> is treated as value to test.
+              Input <code class="qmark">?</code> is treated as value to test.
             </div>
           {/if}
         </div>
@@ -625,6 +625,16 @@ return
     overflow: auto;
     padding: 4px;
     width: 100%;
+  }
+
+  .qmark {
+    background: steelblue;
+    padding: .1em .4em;
+    display: inline-block;
+    border-radius: 0.3em;
+    color: white;
+    vertical-align: middle;
+    font-weight: bold;
   }
 
   :global(.cm-editor) {

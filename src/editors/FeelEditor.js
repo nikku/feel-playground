@@ -35,8 +35,23 @@ function feelLanguage(dialect, context) {
       contextTracker,
       props: [
         indentNodeProp.add({
-          'Context List': (context) => {
-            return context.lineIndent(context.node.from) + context.unit;
+          'Context': (context) => {
+            const indent = context.lineIndent(context.node.from);
+
+            if (/^\s*\}/.test(context.textAfter)) {
+              return indent;
+            } else {
+              return indent + context.unit;
+            }
+          },
+          'List': (context) => {
+            const indent = context.lineIndent(context.node.from);
+
+            if (/^\s*\]/.test(context.textAfter)) {
+              return indent;
+            } else {
+              return indent + context.unit;
+            }
           },
           'ForExpression QuantifiedExpression IfExpression'(context) {
             if (/^\s*(then|else|return|satisfies)/.test(context.textAfter)) {

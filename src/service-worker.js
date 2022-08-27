@@ -1,13 +1,12 @@
+// eslint-disable-next-line
+/// <reference lib="WebWorker" />
+
 const CACHE = 'feel-playground-cache-v1';
 
 function precache() {
   return caches.open(CACHE).then(function(cache) {
     return cache.addAll([
       './',
-      './vendor/codemirror/lib/codemirror.css',
-      './vendor/codemirror/lib/codemirror.js',
-      './vendor/codemirror/mode/javascript/javascript.js',
-      './vendor/feelin/dist/feelin.umd.js',
       './bundle.css',
       './bundle.js',
       './favicon.png',
@@ -17,12 +16,27 @@ function precache() {
   });
 }
 
+/**
+ * @param { Request } request
+ *
+ * @return { Request }
+ */
+function normalizeRequest(request) {
+  const url = new URL(request.url);
+
+  url.search = '';
+
+  return new Request(url);
+}
+
 function cacheResponse(event, request, response) {
+
+  const normalizedRequest = normalizeRequest(request);
 
   return caches.open(CACHE).then(cache => {
 
     if (!event.clientId) {
-      cache.put(request, response);
+      cache.put(normalizedRequest, response);
 
       return;
     }
@@ -30,7 +44,7 @@ function cacheResponse(event, request, response) {
     /* global clients */
     return clients.get(event.clientId).then(client => {
 
-      return cache.match(request).then(matchingResponse => {
+      return cache.match(normalizedRequest).then(matchingResponse => {
 
         if (matchingResponse) {
 
@@ -45,7 +59,7 @@ function cacheResponse(event, request, response) {
           }
         }
 
-        cache.put(request, response);
+        cache.put(normalizedRequest, response);
       });
     });
   });
@@ -67,9 +81,15 @@ function fromNetwork(event, request) {
   });
 }
 
+/**
+ * @param { FetchEvent } event
+ * @param { Request } request
+ *
+ * @return { Promise<Request> }
+ */
 function fromCache(event, request) {
   return caches.open(CACHE).then(cache => {
-    return cache.match(request).then(matching => {
+    return cache.match(normalizeRequest(request)).then(matching => {
       return matching || Promise.reject('not-in-cache');
     });
   });
@@ -98,6 +118,7 @@ self.addEventListener('fetch', function(event) {
   event.respondWith(
     fromCache(event, request)
       .catch(() => remoteFetch)
+      .catch(() => null)
   );
 
   event.waitUntil(remoteFetch);

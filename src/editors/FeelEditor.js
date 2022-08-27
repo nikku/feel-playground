@@ -3,7 +3,8 @@ import {
   LRLanguage,
   foldNodeProp,
   indentNodeProp,
-  syntaxTree
+  syntaxTree,
+  foldInside
 } from '@codemirror/language';
 
 import {
@@ -63,28 +64,8 @@ function feelLanguage(dialect, context) {
           }
         }),
         foldNodeProp.add({
-          Context(node) {
-            const first = node.firstChild;
-            const last = node.lastChild;
-
-            if (!first || first.name != '{') return null;
-
-            return {
-              from: first.to,
-              to: last.name == '}' ? last.from : node.to
-            };
-          },
-          List(node) {
-            const first = node.firstChild;
-            const last = node.lastChild;
-
-            if (!first || first.name != '[') return null;
-
-            return {
-              from: first.to,
-              to: last.name == ']' ? last.from : node.to
-            };
-          },
+          Context: foldInside,
+          List: foldInside,
           FunctionDefinition(node) {
             const last = node.getChild(')');
 

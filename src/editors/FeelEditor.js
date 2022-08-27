@@ -2,7 +2,8 @@ import {
   LanguageSupport,
   LRLanguage,
   foldNodeProp,
-  indentNodeProp
+  indentNodeProp,
+  syntaxTree
 } from '@codemirror/language';
 
 import {

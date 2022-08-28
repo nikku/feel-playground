@@ -4,7 +4,7 @@ import { keymap, highlightSpecialChars, drawSelection, highlightActiveLine, drop
 import { EditorState } from '@codemirror/state';
 import { defaultHighlightStyle, syntaxHighlighting, indentOnInput, bracketMatching,
   foldGutter, foldKeymap } from '@codemirror/language';
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
 import { autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { lintKeymap, lintGutter } from '@codemirror/lint';
@@ -39,7 +39,8 @@ export const basicEditor = (() => [
     ...historyKeymap,
     ...foldKeymap,
     ...completionKeymap,
-    ...lintKeymap
+    ...lintKeymap,
+    indentWithTab
   ])
 ])();
 

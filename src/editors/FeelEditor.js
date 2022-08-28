@@ -4,7 +4,9 @@ import {
   foldNodeProp,
   indentNodeProp,
   syntaxTree,
-  foldInside
+  foldInside,
+  delimitedIndent,
+  continuedIndent
 } from '@codemirror/language';
 
 import {
@@ -26,24 +28,6 @@ import {
   basicViewer
 } from './BaseEditor';
 
-/**
- * @param { string } close
- *
- * @return { (context: import('@codemirror/language').TreeIndentContext) => number } indenter
- */
-function indentInside(close) {
-
-  return (context) => {
-    const indent = context.lineIndent(context.node.from);
-
-    if (context.textAfter.trimStart().startsWith(close)) {
-      return indent;
-    } else {
-      return indent + context.unit;
-    }
-  };
-}
-
 function feelLanguage(dialect, context) {
 
   const top = dialect === 'unaryTest' ? 'UnaryTests' : 'Expressions';
@@ -54,16 +38,18 @@ function feelLanguage(dialect, context) {
       contextTracker,
       props: [
         indentNodeProp.add({
-          'Context': indentInside('}'),
-          'List FilterExpression': indentInside(']'),
-          'FunctionInvocation ParenthesizedExpression': indentInside(')'),
-          'ForExpression QuantifiedExpression IfExpression'(context) {
-            if (/^\s*(then|else|return|satisfies)/.test(context.textAfter)) {
-              return context.lineIndent(context.node.from);
-            } else {
-              return context.lineIndent(context.node.from) + context.unit;
-            }
-          }
+          'Context': delimitedIndent({
+            closing: '}'
+          }),
+          'List FilterExpression': delimitedIndent({
+            closing: ']'
+          }),
+          'FunctionInvocation ParenthesizedExpression': delimitedIndent({
+            closing: ')'
+          }),
+          'ForExpression QuantifiedExpression IfExpression': continuedIndent({
+            except: /^\s*(then|else|return|satisfies)\b/
+          })
         }),
         foldNodeProp.add({
           Context: foldInside,
@@ -83,6 +69,7 @@ function feelLanguage(dialect, context) {
       top
     }),
     languageData: {
+      indentOnInput: /^\s*(\)|\}|\]|then|else|return|satisfies)$/,
       commentTokens: {
         line: '//',
         block: {

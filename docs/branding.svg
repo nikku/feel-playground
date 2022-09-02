@@ -2,18 +2,46 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="102.25267mm"
-   height="7.4083328mm"
-   viewBox="0 0 102.25267 7.4083328"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
    version="1.1"
    id="svg314"
+   inkscape:export-filename="logo.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="branding.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview316"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="false"
+     inkscape:zoom="3.659624"
+     inkscape:cx="190.04685"
+     inkscape:cy="104.24568"
+     inkscape:window-width="3015"
+     inkscape:window-height="1627"
+     inkscape:window-x="2560"
+     inkscape:window-y="69"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g4555" />
   <defs
      id="defs311" />
   <g
-     id="layer1"
-     transform="translate(-21.206181,-16.375001)">
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
     <g
        id="g4555"
        transform="matrix(0.66413354,0,0,0.66413354,7.1224447,5.499814)"
@@ -74,6 +102,21 @@
            d="m 120.52019,25.023037 c 0.69568,0 1.36738,-0.395819 1.83516,-0.863604 h 0.036 l 0.096,0.71967 h 0.97156 v -8.504101 h -1.18746 v 2.182999 l 0.06,1.043522 h -0.036 c -0.47978,-0.467786 -0.99554,-0.731665 -1.67923,-0.731665 -1.35538,0 -2.6268,1.175461 -2.6268,3.082587 0,1.943109 1.00754,3.070592 2.53084,3.070592 z m 0.27588,-0.983549 c -0.99555,0 -1.58328,-0.755654 -1.58328,-2.099038 0,-1.271417 0.75566,-2.075048 1.66724,-2.075048 0.46778,0 0.92357,0.155928 1.39136,0.599725 v 2.782724 c -0.45579,0.527758 -0.94757,0.791637 -1.47532,0.791637 z"
            id="path4737" />
       </g>
+      <rect
+         style="fill:#4682b4;fill-opacity:1;stroke-width:1.24373;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:0.820837;stop-color:#000000"
+         id="rect4894"
+         width="47.923695"
+         height="47.923695"
+         x="22.824919"
+         y="41.834351"
+         rx="8.5141459"
+         inkscape:export-filename="favicon.png"
+         inkscape:export-xdpi="203.50177"
+         inkscape:export-ydpi="203.50177" />
+      <path
+         d="M 56.315157,68.431509 V 63.692394 H 43.344946 v -8.231096 h 14.591486 v -4.7599 H 37.483407 V 80.96522 h 5.861539 V 68.431509 Z"
+         style="font-weight:bold;font-size:11.2889px;line-height:1.25;font-family:'Roboto Mono';-inkscape-font-specification:'Roboto Mono, Bold';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke-width:0.398388"
+         id="path4710-9" />
     </g>
   </g>
 </svg>

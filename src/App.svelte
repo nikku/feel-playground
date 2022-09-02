@@ -288,7 +288,7 @@ return
   <header class="hcontainer">
 
     <div class="app-title">
-      <a href="/" class="app-logo">
+      <a href="./" class="app-logo">
         <svg viewBox="0 0 69.25 7.41" xmlns="http://www.w3.org/2000/svg">
           <g aria-label="FEEL">
             <path fill="currentColor" d="M3.32 3.45v-.83H1.03V1.17H3.6V.33H0v5.33h1.03v-2.2zM7.71 3.32v-.81H5.52V1.17h2.55V.33H4.5v5.33h3.6v-.83H5.51v-1.5ZM12.21 3.32v-.81h-2.19V1.17h2.55V.33H9v5.33h3.6v-.83h-2.57v-1.5ZM14.53 4.83V.33H13.5v5.33h3.53v-.83z"/>

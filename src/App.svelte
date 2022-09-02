@@ -441,7 +441,7 @@ return
 
   header {
     box-shadow: 0 0 3px 0 #999;
-    background: hsl(207, 56%, 99%);
+    background: #FCFCFC;
 
     margin: 0;
     margin-bottom: 10px;

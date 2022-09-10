@@ -43,10 +43,6 @@ const highlightField = StateField.define({
   provide: field => EditorView.decorations.from(field)
 });
 
-const highlightTheme = EditorView.baseTheme({
-  '.cm-highlight': { textDecoration: 'highlight 3px red' }
-});
-
 /**
  * @param { import('@codemirror/view').EditorView } view
  * @param { Range|null } range
@@ -63,7 +59,7 @@ export function highlightSelection(view, range) {
 
   if (!view.state.field(highlightField, false)) {
     effects.push(StateEffect.appendConfig.of([
-      highlightField, highlightTheme
+      highlightField
     ]));
   }
 

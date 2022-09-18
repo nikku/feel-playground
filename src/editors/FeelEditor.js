@@ -1,20 +1,14 @@
 import {
-  LanguageSupport,
-  LRLanguage,
-  foldNodeProp,
-  indentNodeProp,
   syntaxTree,
-  foldInside,
-  delimitedIndent,
-  continuedIndent
 } from '@codemirror/language';
 
 import {
   Compartment
 } from '@codemirror/state';
 
-
-import { parser, trackVariables } from 'lezer-feel';
+import {
+  feel
+} from 'lang-feel';
 
 import { highlightSelection } from './Highlight';
 import { feelLinter } from './Linting';
@@ -28,59 +22,17 @@ import {
   basicViewer
 } from './BaseEditor';
 
+/**
+ * @param { 'expressions' | 'unaryTests' } dialect
+ * @param { Record<string, any> } context
+ *
+ * @return { LanguageSupport }
+ */
 function feelLanguage(dialect, context) {
-
-  const top = dialect === 'unaryTest' ? 'UnaryTests' : 'Expressions';
-  const contextTracker = trackVariables(context);
-
-  const FeelLanguage = LRLanguage.define({
-    parser: parser.configure({
-      contextTracker,
-      props: [
-        indentNodeProp.add({
-          'Context': delimitedIndent({
-            closing: '}'
-          }),
-          'List FilterExpression': delimitedIndent({
-            closing: ']'
-          }),
-          'FunctionInvocation ParenthesizedExpression': delimitedIndent({
-            closing: ')'
-          }),
-          'ForExpression QuantifiedExpression IfExpression': continuedIndent({
-            except: /^\s*(then|else|return|satisfies)\b/
-          })
-        }),
-        foldNodeProp.add({
-          Context: foldInside,
-          List: foldInside,
-          FunctionDefinition(node) {
-            const last = node.getChild(')');
-
-            if (!last) return null;
-
-            return {
-              from: last.to,
-              to: node.to
-            };
-          }
-        })
-      ],
-      top
-    }),
-    languageData: {
-      indentOnInput: /^\s*(\)|\}|\]|then|else|return|satisfies)$/,
-      commentTokens: {
-        line: '//',
-        block: {
-          open: '/*',
-          close: '*/'
-        }
-      }
-    }
+  return feel({
+    dialect,
+    context
   });
-
-  return new LanguageSupport(FeelLanguage, [ ]);
 }
 
 
@@ -105,10 +57,10 @@ export default function FeelEditor({
   onMouseout
 }) {
 
-  const languageConfig = new Compartment();
+  const language = new Compartment();
 
   const extensions = [
-    languageConfig.of(feelLanguage(dialect, context))
+    language.of(feelLanguage(dialect, context))
   ];
 
   if (onMousemove || onMouseout) {
@@ -138,7 +90,7 @@ export default function FeelEditor({
     parent
   });
 
-  this._languageConfig = languageConfig;
+  this._language = language;
 
   this._dialect = dialect;
   this._context = context;
@@ -177,7 +129,7 @@ FeelEditor.prototype._configureLanguage = function(dialect, context) {
   this._context = context;
 
   this._cm.dispatch({
-    effects: this._languageConfig.reconfigure(
+    effects: this._language.reconfigure(
       feelLanguage(dialect, context)
     ),
     changes: {

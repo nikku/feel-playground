@@ -1,5 +1,5 @@
 import {
-  syntaxTree,
+  syntaxTree
 } from '@codemirror/language';
 
 import {

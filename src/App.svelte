@@ -8,6 +8,11 @@
   } from './FeelEngine';
 
   import {
+    compress,
+    decompress
+  } from './util';
+
+  import {
     lintError
   } from './editors/Linting';
 
@@ -111,8 +116,8 @@ return
     const url = new URL(window.location.href);
 
     return {
-      expression: url.searchParams.get('e'),
-      contextString: url.searchParams.get('c'),
+      expression: decompress(url.searchParams.get('e')),
+      contextString: decompress(url.searchParams.get('c')),
       dialect: url.searchParams.get('t')
     };
   }
@@ -121,8 +126,8 @@ return
 
     const url = new URL(window.location.href);
 
-    url.searchParams.set('e', expression);
-    url.searchParams.set('c', contextString);
+    url.searchParams.set('e', compress(expression));
+    url.searchParams.set('c', compress(contextString));
     url.searchParams.set('t', dialect);
     url.hash = '';
 

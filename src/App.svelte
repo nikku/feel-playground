@@ -445,7 +445,7 @@ return
   }
 
   header {
-    box-shadow: 0 0 3px 0 #999;
+    border-bottom: solid 1px #999;
     background: #FCFCFC;
 
     margin: 0;

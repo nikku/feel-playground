@@ -2448,7 +2448,6 @@ const LZMA = (function() {
 
     this$static.c = $LZMAByteArrayCompressor({}, encode(str), get_mode_obj(mode));
     while ($processChunk(this$static.c.chunker));
-    console.log(this$static.c.output);
     return $toByteArray(this$static.c.output);
   }
 

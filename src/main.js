@@ -1,9 +1,9 @@
 import './shims';
 
-import App from './App.svelte';
+import AppParent from './AppParent.svelte';
 
-const app = new App({
+const appParent = new AppParent({
   target: document.body
 });
 
-export default app;
+export default appParent;

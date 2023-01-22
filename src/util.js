@@ -794,7 +794,7 @@ const LZMA = (function() {
 
   /** de */
 
-  function $processChunk(this$static) {
+  async function $processChunk(this$static) {
     if (!this$static.alive) {
       throw new Error('bad state');
     }
@@ -2443,21 +2443,21 @@ const LZMA = (function() {
     return data;
   }
 
-  function compress(str, mode) {
+  async function compress(str, mode) {
     var this$static = {};
 
     this$static.c = $LZMAByteArrayCompressor({}, encode(str), get_mode_obj(mode));
-    while ($processChunk(this$static.c.chunker));
+    while (await $processChunk(this$static.c.chunker));
     return $toByteArray(this$static.c.output);
   }
 
   /** ce */
   /** ds */
-  function decompress(byte_arr) {
+  async function decompress(byte_arr) {
     var this$static = {};
 
     this$static.d = $LZMAByteArrayDecompressor({}, byte_arr);
-    while ($processChunk(this$static.d.chunker));
+    while (await $processChunk(this$static.d.chunker));
     return decode($toByteArray(this$static.d.output));
   }
 
@@ -2468,7 +2468,7 @@ const LZMA = (function() {
     // / s is dictionarySize
     // / f is fb
     // / m is matchFinder
-    // /NOTE: Because some values are always the same, they have been removed.
+    // / NOTE: Because some values are always the same, they have been removed.
     // / lc is always 3
     // / lp is always 0
     // / pb is always 2
@@ -2656,18 +2656,20 @@ const b64 = (function() {
   };
 })();
 
-export function compress(str) {
+export async function compress(str) {
   if (str.length > 50) {
-    return '~' + b64.fromByteArray(LZMA.compress(str, 4).map(v => v + 128));
+    const compressed = await LZMA.compress(str, 4);
+
+    return '~' + b64.fromByteArray(compressed.map(v => v + 128));
   } else {
     return str;
   }
 }
 
-export function decompress(str) {
+export async function decompress(str) {
 
   if (str && str.startsWith('~')) {
-    return LZMA.decompress(b64.toByteArray(str.slice(1)).map(v => v - 128));
+    return await LZMA.decompress(b64.toByteArray(str.slice(1)).map(v => v - 128));
   } else {
     return str;
   }

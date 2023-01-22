@@ -43,7 +43,8 @@ function feelLanguage(dialect, context) {
  *   parent: Element,
  *   onChange?: (value: string) -> void,
  *   onMousemove?: (number: position) -> void,
- *   onMouseout?: (number: position) -> void
+ *   onMouseout?: (number: position) -> void,
+ *   onBlur?: () -> void
  * } } options
  */
 export default function FeelEditor({
@@ -54,7 +55,8 @@ export default function FeelEditor({
   readOnly = false,
   onChange,
   onMousemove,
-  onMouseout
+  onMouseout,
+  onBlur
 }) {
 
   const language = new Compartment();
@@ -66,7 +68,9 @@ export default function FeelEditor({
   if (onMousemove || onMouseout) {
     extensions.push(onMouseHandlers({
       'mousemove': onMousemove,
-      'mouseout': onMouseout
+      'mouseout': onMouseout,
+      'blur': onBlur,
+      'mouseleave': onBlur
     }));
   }
 

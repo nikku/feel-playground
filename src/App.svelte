@@ -70,6 +70,9 @@ return
           }
         }
       },
+      onBlur: () => {
+        treeSelection = null;
+      },
       parent: codeEditorElement
     });
 

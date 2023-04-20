@@ -119,6 +119,29 @@ export function onChangeHandler(onChange) {
 }
 
 /**
+ * @param { (string) => void } onChange
+ *
+ * @return { Extension }
+ */
+export function onSelectionChangeHandler(onChange) {
+
+  let selection = null;
+
+  return EditorView.updateListener.of((update) => {
+
+    const newSelection = update.state.selection;
+
+    if (selection && newSelection.eq(selection)) {
+      return;
+    }
+
+    selection = newSelection;
+
+    onChange(selection);
+  });
+}
+
+/**
  * @param { {
  *   extensions?: Extension[],
  *   parent: Element,

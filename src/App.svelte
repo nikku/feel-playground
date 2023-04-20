@@ -33,7 +33,10 @@
 
   let treeRoot = { name: 'Expressions', from: 0, to: 0, children: [] };
 
+  let editorSelection;
+
   let treeSelection;
+  let codeSelection;
 
   let dialect = params.dialect || 'expression';
 
@@ -61,18 +64,7 @@ return
       context,
       dialect,
       onChange: (doc) => expression = doc,
-      onMousemove: (position) => {
-        if (treeRoot) {
-          const newSelection = findTreeNode(position, treeRoot);
-
-          if (newSelection !== treeSelection) {
-            treeSelection = newSelection;
-          }
-        }
-      },
-      onBlur: () => {
-        treeSelection = null;
-      },
+      onSelectionChange: (selection) => editorSelection = selection,
       parent: codeEditorElement
     });
 
@@ -105,9 +97,9 @@ return
     console.timeEnd('renderSelection');
   }
 
-  function findTreeNode(index, treeRoot) {
+  function findTreeNode(position, treeRoot) {
 
-    if (index >= treeRoot.to || index <= treeRoot.from) {
+    if (position.from > treeRoot.to || position.to < treeRoot.from) {
       return null;
     }
 
@@ -118,7 +110,7 @@ return
       // find child that matches node
       for (const child of node.children) {
 
-        if (child.from <= index && child.to > index) {
+        if (child.from <= position.from && child.to >= position.to) {
           if (!child.children.length) {
             return child;
           }
@@ -133,6 +125,19 @@ return
       return node;
     }
 
+  }
+
+  function computeCodeSelection(treeRoot, selection) {
+
+    if (!treeRoot || !selection || selection.ranges.length !== 1) {
+      codeSelection = null;
+    } else {
+      const newSelection = findTreeNode(selection.ranges[0], treeRoot);
+
+      if (newSelection !== codeSelection) {
+        codeSelection = newSelection;
+      }
+    }
   }
 
   const updateStack = debounce(function updateStack(dialect, expression = '', context) {
@@ -242,6 +247,8 @@ return
   $: updateStack(dialect, expression, context);
 
   $: evaluateExpression(dialect, expression, context);
+
+  $: computeCodeSelection(treeRoot, editorSelection);
 
   $: renderSelection(codeEditor, treeSelection);
 
@@ -355,7 +362,7 @@ return
     </h3>
 
     <div class="content" class:with-error={ expressionErrors.length }>
-      <TreeNode node={ treeRoot } selection={ treeSelection } onSelect={ selectExpression } />
+      <TreeNode node={ treeRoot } selection={ treeSelection || codeSelection } onSelect={ selectExpression } />
     </div>
   </div>
 

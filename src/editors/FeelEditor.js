@@ -19,7 +19,8 @@ import {
   onMouseHandlers,
   basicEditor,
   advancedEditor,
-  basicViewer
+  basicViewer,
+  onSelectionChangeHandler
 } from './BaseEditor';
 
 /**
@@ -54,6 +55,7 @@ export default function FeelEditor({
   dialect = 'expression',
   readOnly = false,
   onChange,
+  onSelectionChange,
   onMousemove,
   onMouseout,
   onBlur
@@ -86,6 +88,10 @@ export default function FeelEditor({
 
   if (onChange) {
     extensions.push(onChangeHandler(onChange));
+  }
+
+  if (onSelectionChange) {
+    extensions.push(onSelectionChangeHandler(onSelectionChange));
   }
 
   this._cm = createEditor({

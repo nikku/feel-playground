@@ -42,7 +42,7 @@
 <div class="node" bind:this={ el } class:selected={ selected } on:mouseover={ handleSelect } on:mouseleave={ handleDeselect }>
 
   <div class="description">
-    <span class:error={ node.error } class="name" title={ node.error && node.error.message }>{ node.error ? 'ERROR' : node.name }</span> [ { node.from }, { node.to } ]
+    <span class:error={ node.error } class="name" title={ node.error && node.error.message || '' }>{ node.error ? 'ERROR' : node.name }</span> [ { node.from }, { node.to } ]
   </div>
 
   {#if node.children.length}

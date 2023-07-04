@@ -7,12 +7,12 @@ import {
 
 const parsers = {
   expression: parseExpression,
-  unaryTest: parseUnaryTests
+  unaryTests: parseUnaryTests
 };
 
 const interpreters = {
   expression: evalExpression,
-  unaryTest: evalUnaryTest
+  unaryTests: evalUnaryTest
 };
 
 /**

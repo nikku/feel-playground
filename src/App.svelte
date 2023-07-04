@@ -266,7 +266,7 @@ return
 
         <select class="typeselect" name="dialect" bind:value={ dialect }>
           <option value="expression">Expression</option>
-          <option value="unaryTest">Unary Test</option>
+          <option value="unaryTests">Unary Test</option>
         </select>
 
         {#if expressionErrors.length }
@@ -311,7 +311,7 @@ return
           Define your input variables as a JSON object literal.
         </div>
 
-        {#if dialect === 'unaryTest'}
+        {#if dialect === 'unaryTests'}
           <div class="note">
             Input <code class="qmark">?</code> is treated as value to test.
           </div>

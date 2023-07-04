@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "all": "run-s lint build",
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
+    "build": "rollup -c --bundleConfigAsCjs",
+    "dev": "rollup -c -w --bundleConfigAsCjs",
     "start": "sirv public",
     "lint": "eslint . --ext js,svelte"
   },
@@ -17,8 +17,9 @@
     "@codemirror/search": "^6.2.0",
     "@codemirror/state": "^6.1.1",
     "@codemirror/view": "^6.2.4",
-    "@rollup/plugin-commonjs": "^23.0.2",
-    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-commonjs": "^25.0.2",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@rollup/plugin-terser": "^0.4.3",
     "eslint": "^8.44.0",
     "eslint-plugin-bpmn-io": "^1.0.0",
     "eslint-plugin-svelte3": "^4.0.0",
@@ -28,12 +29,11 @@
     "min-dash": "^4.1.1",
     "npm-run-all": "^4.1.5",
     "opener": "^1.5.2",
-    "rollup": "^2.79.1",
+    "rollup": "^3.26.0",
     "rollup-plugin-copy": "^3.4.0",
-    "rollup-plugin-css-only": "^3.1.0",
+    "rollup-plugin-css-only": "^4.3.0",
     "rollup-plugin-livereload": "^2.0.5",
-    "rollup-plugin-svelte": "^7.1.0",
-    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-svelte": "^7.1.6",
     "sirv-cli": "^2.0.2",
     "svelte": "^3.53.1"
   }

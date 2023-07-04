@@ -31,7 +31,7 @@
   let contextEditor;
   let outputViewer;
 
-  let treeRoot = { name: 'Expressions', from: 0, to: 0, children: [] };
+  let treeRoot = { name: 'Expression', from: 0, to: 0, children: [] };
 
   let editorSelection;
 

@@ -1,12 +1,12 @@
 import {
   unaryTest as evalUnaryTest,
   evaluate as evalExpression,
-  parseExpressions,
+  parseExpression,
   parseUnaryTests
 } from 'feelin';
 
 const parsers = {
-  expression: parseExpressions,
+  expression: parseExpression,
   unaryTest: parseUnaryTests
 };
 

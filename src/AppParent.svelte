@@ -42,10 +42,12 @@
       decompress(url.searchParams.get('c'))
     ]);
 
+    const dialect = url.searchParams.get('t');
+
     return {
       expression,
       contextString,
-      dialect: url.searchParams.get('t')
+      dialect: dialect === 'unaryTest' ? 'unaryTests' : dialect
     };
   }
 

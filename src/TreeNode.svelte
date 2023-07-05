@@ -39,7 +39,7 @@
   });
 </script>
 
-<div class="node" bind:this={ el } class:selected={ selected } on:mouseover={ handleSelect } on:mouseleave={ handleDeselect }>
+<div class="node" bind:this={ el } class:selected={ selected } on:mouseover={ handleSelect } on:mouseleave={ handleDeselect } on:focus={ handleSelect }>
 
   <div class="description">
     <span class:error={ node.error } class="name" title={ node.error && node.error.message || '' }>{ node.error ? 'ERROR' : node.name }</span>

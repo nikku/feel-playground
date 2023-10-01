@@ -28,7 +28,7 @@
   let outputElement;
 
   let codeEditor;
-  let contextEditor;
+  let _contextEditor;
   let outputViewer;
 
   let treeRoot = { name: 'Expression', from: 0, to: 0, children: [] };
@@ -68,7 +68,7 @@ return
       parent: codeEditorElement
     });
 
-    contextEditor = new JsonEditor({
+    _contextEditor = new JsonEditor({
       doc: contextString,
       onChange: (doc) => contextString = doc,
       parent: contextEditorElement

@@ -39,12 +39,12 @@
   });
 </script>
 
-<div class="node" bind:this={ el } class:selected={ selected } on:mouseover={ handleSelect } on:mouseleave={ handleDeselect } on:focus={ handleSelect }>
+<div class="node" bind:this={ el } class:selected={ selected }>
 
-  <div class="description">
+  <button class="description btn-none" on:mouseover={ handleSelect } on:mouseleave={ handleDeselect } on:focus={ handleSelect }>
     <span class:error={ node.error } class="name" title={ node.error && node.error.message || '' }>{ node.error ? 'ERROR' : node.name }</span>
     <span class="position">[{ node.from }, { node.to }]</span>
-  </div>
+  </button>
 
   {#if node.children.length}
     <div class="children">
@@ -88,5 +88,15 @@
 
   .children {
     padding-left: 20px;
+  }
+
+  .btn-none {
+    font-family: inherit;
+    font-size: inherit;
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
   }
 </style>

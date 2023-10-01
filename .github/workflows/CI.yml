@@ -22,7 +22,7 @@ jobs:
     - name: Build
       run: npm run all
     - name: Update Example
-      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       env:
         GIT_USER_NAME: ${{secrets.GIT_USER_USERNAME}}
         GIT_USER_EMAIL: ${{secrets.GIT_USER_EMAIL}}

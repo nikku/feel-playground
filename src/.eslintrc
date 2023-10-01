@@ -1,3 +1,15 @@
 {
-  "extends": "plugin:bpmn-io/browser"
+  "extends": [
+    "plugin:bpmn-io/browser",
+    "plugin:svelte/recommended"
+  ],
+  "plugins": [
+    "svelte"
+  ],
+  "overrides": [
+    {
+      "files": [ "*.svelte" ],
+      "parser": "svelte-eslint-parser"
+    }
+  ]
 }

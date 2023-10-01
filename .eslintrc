@@ -1,12 +1,5 @@
 {
-  "extends": "plugin:bpmn-io/recommended",
-  "plugins": [
-    "svelte3"
-  ],
-  "overrides": [
-    {
-      "files": ["*.svelte"],
-      "processor": "svelte3/svelte3"
-    }
+  "extends": [
+    "plugin:bpmn-io/recommended"
   ]
 }

@@ -87,6 +87,7 @@ return
 
   function selectExpression(node) {
     treeSelection = node;
+    codeSelection = null;
   }
 
   function renderSelection(codeEditor, node) {

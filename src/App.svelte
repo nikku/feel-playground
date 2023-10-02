@@ -265,7 +265,7 @@ return
       <h3 class="legend">
         Code
 
-        <select class="typeselect" name="dialect" bind:value={ dialect }>
+        <select class="type-select" name="dialect" bind:value={ dialect }>
           <option value="expression">Expression</option>
           <option value="unaryTests">Unary Test</option>
         </select>
@@ -396,9 +396,10 @@ return
     font-family: monospace;
   }
 
-  .typeselect {
+  .type-select {
     display: inline-block;
-    padding: .275rem 2rem .275rem .75rem;
+    padding: .225rem 1.75rem .225rem .5rem;
+    margin-left: .5rem;
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.3;
@@ -416,20 +417,14 @@ return
   }
 
   .legend {
-    font-size: 1.2em;
+    font-size: 1.1em;
     color: #444;
     border-radius: 3px;
-    margin: 0 0 5px;
+    margin: .25em 0;
     display: flex;
     align-items: center;
     padding: 0;
     line-height: 2em;
-  }
-
-  select {
-    color: inherit;
-    margin-left: 10px;
-    font-size: .90em;
   }
 
   .content {

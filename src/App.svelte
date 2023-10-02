@@ -286,7 +286,7 @@ return
       <div class="container context-editor">
 
         <h3 class="legend">
-          Input
+          JSON Input
 
           {#if contextError }
             <div class="error">
@@ -322,7 +322,7 @@ return
       <div class="container output">
 
         <h3 class="legend">
-          Output
+          JSON Output
 
           {#if outputError }
             <div class="error">
@@ -353,7 +353,7 @@ return
   <div class="container tree" style="flex: 0.5; min-width: 300px;">
 
     <h3 class="legend">
-      Tree
+      Syntax Tree
 
       {#if expressionErrors.length }
         <div class="error">

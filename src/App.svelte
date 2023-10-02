@@ -363,7 +363,10 @@ return
     </h3>
 
     <div class="content" class:with-error={ expressionErrors.length }>
-      <TreeNode node={ treeRoot } selection={ treeSelection || codeSelection } onSelect={ selectExpression } />
+      <TreeNode
+        node={ treeRoot }
+        selection={ treeSelection || codeSelection }
+        onSelect={ selectExpression } />
     </div>
   </div>
 

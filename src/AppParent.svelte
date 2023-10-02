@@ -128,8 +128,8 @@
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.3;
-    color: #495057;
-    border: 1px solid #999;
+    color: #EEE;
+    border: 1px solid #EEE;
     border-radius: .5em;
   }
 
@@ -138,20 +138,18 @@
   }
 
   :global(.btn-feel) {
-    color: steelblue;
+    background: steelblue !important;
+    color: #FEFEFE;
     border-color: steelblue;
   }
 
   :global(.btn):hover {
-    background: #666;
-    border-color: #666;
-    color: #FEFEFE;
+    background: #333;
+    filter: brightness(120%);
   }
 
   :global(.btn-feel):hover {
-    background: steelblue;
-    color: #FEFEFE;
-    border-color: steelblue;
+    filter: brightness(110%);
   }
 
   :global(.hcontainer),
@@ -185,16 +183,15 @@
   }
 
   main {
-    --color-error-fg: white;
+    --color-error-fg: #FEFEFE;
     --color-error-bg: #d11;
   }
 
   header {
-    border-bottom: solid 1px #999;
-    background: #FCFCFC;
+    border-bottom: none;
+    background: #333;
 
     margin: 0;
-    margin-bottom: 10px;
     padding: 7px 10px;
   }
 
@@ -207,7 +204,7 @@
 
   .app-logo svg {
     height: 23px;
-    color: steelblue;
+    color: #FAFAFA;
     margin: 0 5px;
     margin-bottom: -.5em;
   }

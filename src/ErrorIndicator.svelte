@@ -15,6 +15,10 @@
     color: var(--color-error-bg);
   }
 
+  .error-indicator svg {
+    margin-bottom: -0.225rem;
+  }
+
   .error-indicator:hover {
     background: #DFDFDF;
   }

@@ -4,7 +4,8 @@
 
   import {
     evaluate as evaluateFeel,
-    parse as parseFeel
+    parse as parseFeel,
+    SyntaxError
   } from './FeelEngine';
 
   import {
@@ -44,12 +45,14 @@
   fruit in [ "apple", "bananas" ], vegetable in vegetables
 return
   { ingredients: [ fruit, vegetable ] }`;
-  let expressionErrors = [];
+
 
   let showSyntaxTree = params.showSyntaxTree || false;
 
   let output = undefined;
   let outputError = null;
+
+  let expressionError = null;
 
   let context;
 
@@ -225,11 +228,18 @@ return
     try {
       output = evaluateFeel(dialect, expression, context);
       outputError = null;
+      expressionError = null;
     } catch (err) {
       console.error(err);
 
+      if (err instanceof SyntaxError) {
+        expressionError = err;
+        outputError = new Error('Unparseable input');
+      } else {
+        outputError = err;
+      }
+
       output = undefined;
-      outputError = err;
     }
   }, 0);
 
@@ -272,9 +282,11 @@ return
           <option value="unaryTests">Unary Test</option>
         </select>
 
-        {#if expressionErrors.length }
+        <span class="spacer"></span>
+
+        {#if expressionError }
           <div class="error">
-            <ErrorIndicator error={ expressionErrors[0] } />
+            <ErrorIndicator error={ expressionError } />
           </div>
         {/if}
 
@@ -289,6 +301,12 @@ return
 
       <div class="content" bind:this={ codeEditorElement }>
       </div>
+
+      {#if expressionError}
+        <div class="note error-note">
+          Syntax error: { expressionError.message } {#if expressionError.input}parsing &lt;{ expressionError.input }&gt; {/if}at [{expressionError.position.from}, {expressionError.position.to}]
+        </div>
+      {/if}
 
     </div>
 
@@ -366,9 +384,9 @@ return
       <h3 class="legend">
         <span class="label">Syntax Tree</span>
 
-        {#if expressionErrors.length }
+        {#if expressionError }
           <div class="error">
-            <ErrorIndicator error={ expressionErrors[0] } />
+            <ErrorIndicator error={ expressionError } />
           </div>
         {/if}
 
@@ -380,7 +398,7 @@ return
         </button>
       </h3>
 
-      <div class="content" class:with-error={ expressionErrors[0] }>
+      <div class="content" class:with-error={ expressionError }>
         <TreeNode
           node={ treeRoot }
           selection={ treeSelection || codeSelection }
@@ -466,6 +484,9 @@ return
     overflow: hidden;
   }
 
+  .spacer {
+    flex: 1;
+  }
 
   .tree {
     flex: 0.5;

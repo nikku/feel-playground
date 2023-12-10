@@ -15,6 +15,8 @@ const interpreters = {
   unaryTests: evalUnaryTest
 };
 
+export { SyntaxError } from 'feelin';
+
 /**
  * @param { string } type
  * @param { string } expression

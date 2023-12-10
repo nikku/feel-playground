@@ -437,14 +437,14 @@ return
 
   .type-select {
     display: inline-block;
-    padding: .225rem 1.75rem .225rem .5rem;
-    margin-left: .5rem;
-    font-size: 1rem;
+    padding: .25rem 1.75rem .25rem .5rem;
+    margin-left: 1rem;
+    font-size: .95rem;
     font-weight: 400;
     line-height: 1.3;
     color: #495057;
     vertical-align: middle;
-    background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right .75rem center/8px 10px;
+    background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") no-repeat right .75rem center/8px 10px;
     border: 1px solid #ced4da;
     border-radius: .25rem;
     appearance: none;

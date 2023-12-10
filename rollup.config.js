@@ -35,7 +35,7 @@ export default [
 
       copy({
         targets: [
-          { src: 'src/*.{html,png,svg,json}', dest: 'public' }
+          { src: 'src/*.{html,css,png,svg,json}', dest: 'public' }
         ]
       }),
 

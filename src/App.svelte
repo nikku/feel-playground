@@ -50,9 +50,9 @@ return
   let showSyntaxTree = params.showSyntaxTree || false;
 
   let output = undefined;
-  let outputError = null;
 
-  let expressionError = null;
+  let evalError = null;
+  let syntaxError = null;
 
   let context;
 
@@ -206,7 +206,7 @@ return
     treeRoot = stack[0].children[0];
 
     console.timeEnd('updateStack');
-  }, 0);
+  }, 300);
 
   const parseContext = debounce(function parseContext(contextString) {
     try {
@@ -221,27 +221,26 @@ return
     } catch (err) {
       contextError = err;
     }
-  }, 0);
+  }, 600);
 
   const evaluateExpression = debounce((dialect, expression, context) => {
 
     try {
       output = evaluateFeel(dialect, expression, context);
-      outputError = null;
-      expressionError = null;
+      evalError = null;
+      syntaxError = null;
     } catch (err) {
       console.error(err);
 
       if (err instanceof SyntaxError) {
-        expressionError = err;
-        outputError = new Error('Unparseable input');
+        syntaxError = err;
       } else {
-        outputError = err;
+        evalError = err;
       }
 
       output = undefined;
     }
-  }, 0);
+  }, 600);
 
   function setDialect(codeEditor, dialect) {
     codeEditor && codeEditor.setDialect(dialect);
@@ -284,10 +283,8 @@ return
 
         <span class="spacer"></span>
 
-        {#if expressionError }
-          <div class="error">
-            <ErrorIndicator error={ expressionError } />
-          </div>
+        {#if syntaxError }
+          <ErrorIndicator error={ syntaxError } />
         {/if}
 
         {#if !showSyntaxTree}
@@ -299,14 +296,10 @@ return
         {/if}
       </h3>
 
-      <div class="content" bind:this={ codeEditorElement }>
-      </div>
-
-      {#if expressionError}
-        <div class="note error-note">
-          Syntax error: { expressionError.message } {#if expressionError.input}parsing &lt;{ expressionError.input }&gt; {/if}at [{expressionError.position.from}, {expressionError.position.to}]
-        </div>
-      {/if}
+      <div
+        class="content"
+        bind:this={ codeEditorElement }
+      ></div>
 
     </div>
 
@@ -314,12 +307,12 @@ return
       <div class="container context-editor">
 
         <h3 class="legend">
-          JSON Input
+          Input
+
+          <span class="spacer"></span>
 
           {#if contextError }
-            <div class="error">
-              <ErrorIndicator error={ contextError } />
-            </div>
+            <ErrorIndicator error={ contextError } />
           {/if}
 
         </h3>
@@ -332,7 +325,7 @@ return
 
         {#if contextError}
           <div class="note error-note">
-            { contextError.message }.
+            { contextError.message }
           </div>
         {/if}
 
@@ -350,24 +343,29 @@ return
       <div class="container output">
 
         <h3 class="legend">
-          JSON Output
+          Output
 
-          {#if outputError }
-            <div class="error">
-              <ErrorIndicator error={ outputError } />
-            </div>
+          <span class="spacer"></span>
+
+          {#if evalError || syntaxError }
+            <ErrorIndicator error={ evalError || syntaxError } />
           {/if}
         </h3>
 
         <div class="content"
              bind:this={ outputElement }
-             class:with-error={ outputError }
+             class:with-error={ evalError || syntaxError }
         ></div>
 
-
-        {#if outputError}
+        {#if evalError}
           <div class="note error-note">
-            Evaluation error: { outputError.message }
+            Failed to evaluate FEEL expression: { evalError.message }
+          </div>
+        {/if}
+
+        {#if syntaxError}
+          <div class="note error-note">
+            Failed to parse FEEL expression: { syntaxError.message } {#if syntaxError.input}parsing &lt;{ syntaxError.input }&gt; {/if}at [{syntaxError.position.from}, {syntaxError.position.to}]
           </div>
         {/if}
 
@@ -384,10 +382,10 @@ return
       <h3 class="legend">
         <span class="label">Syntax Tree</span>
 
-        {#if expressionError }
-          <div class="error">
-            <ErrorIndicator error={ expressionError } />
-          </div>
+        <span class="spacer"></span>
+
+        {#if syntaxError }
+          <ErrorIndicator error={ syntaxError } />
         {/if}
 
         <button title="Hide syntax tree" class="btn btn-small btn-none collapse-btn" on:click={ () => showSyntaxTree = !showSyntaxTree }>
@@ -398,7 +396,7 @@ return
         </button>
       </h3>
 
-      <div class="content" class:with-error={ expressionError }>
+      <div class="content">
         <TreeNode
           node={ treeRoot }
           selection={ treeSelection || codeSelection }
@@ -448,11 +446,6 @@ return
     border: 1px solid #ced4da;
     border-radius: .25rem;
     appearance: none;
-  }
-
-  .legend .error {
-    flex: 1;
-    text-align: right;
   }
 
   .legend {

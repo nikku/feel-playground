@@ -9,17 +9,14 @@
 
 <style>
   .error-indicator {
-    padding: 0 .5em;
+    padding: 0 .25em;
     border-radius: 3px;
     display: inline-block;
+    background: var(--color-error-fg);
     color: var(--color-error-bg);
   }
 
   .error-indicator svg {
     margin-bottom: -0.225rem;
-  }
-
-  .error-indicator:hover {
-    background: #DFDFDF;
   }
 </style>

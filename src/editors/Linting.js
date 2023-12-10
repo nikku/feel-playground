@@ -37,7 +37,6 @@ export const feelLinter = linter(view => {
 
 /**
  * @param { import('@lezer/common').SyntaxNodeRef } nodeRef
- * @param { import('@lezer/common').SyntaxNode } [next]
  *
  * @return { { from: number, to: number, message: string } }
  */
@@ -80,7 +79,7 @@ export function lintError(nodeRef) {
  */
 function findNext(nodeRef) {
 
-  let node = nodeRef.node;
+  const node = nodeRef.node;
 
   let next, parent = node;
 

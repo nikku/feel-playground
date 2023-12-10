@@ -43,15 +43,17 @@
     ]);
 
     const dialect = url.searchParams.get('t');
+    const showSyntaxTree = url.searchParams.get('st') !== 'false';
 
     return {
       expression,
       contextString,
-      dialect: dialect === 'unaryTest' ? 'unaryTests' : dialect
+      dialect: dialect === 'unaryTest' ? 'unaryTests' : dialect,
+      showSyntaxTree
     };
   }
 
-  const onParamsChanged = debounce(async (expression, contextString, dialect) => {
+  const onParamsChanged = debounce(async (expression, contextString, dialect, showSyntaxTree) => {
 
     const url = new URL(window.location.href);
 
@@ -66,6 +68,7 @@
     url.searchParams.set('e', e);
     url.searchParams.set('c', c);
     url.searchParams.set('t', dialect);
+    url.searchParams.set('st', showSyntaxTree || false);
     url.hash = '';
 
     window.history.pushState({}, null, url.toString());

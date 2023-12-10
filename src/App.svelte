@@ -46,6 +46,8 @@ return
   { ingredients: [ fruit, vegetable ] }`;
   let expressionErrors = [];
 
+  let showSyntaxTree = params.showSyntaxTree || false;
+
   let output = undefined;
   let outputError = null;
 
@@ -253,7 +255,7 @@ return
 
   $: renderSelection(codeEditor, treeSelection);
 
-  $: onParamsChanged(expression, contextString, dialect);
+  $: onParamsChanged(expression, contextString, dialect, showSyntaxTree);
 </script>
 
 
@@ -274,6 +276,14 @@ return
           <div class="error">
             <ErrorIndicator error={ expressionErrors[0] } />
           </div>
+        {/if}
+
+        {#if !showSyntaxTree}
+          <button title="Show syntax tree" class="btn btn-small btn-none collapse-btn" on:click={ () => showSyntaxTree = !showSyntaxTree }>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-text-fill" viewBox="0 0 16 16">
+  <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1m-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5M5 8h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1m0 2h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1"/>
+</svg>
+          </button>
         {/if}
       </h3>
 
@@ -350,26 +360,34 @@ return
     </div>
   </div>
 
-  <div class="container tree" style="flex: 0.5; min-width: 300px;">
+  {#if showSyntaxTree}
+    <div class="container tree">
 
-    <h3 class="legend">
-      Syntax Tree
+      <h3 class="legend">
+        <span class="label">Syntax Tree</span>
 
-      {#if expressionErrors.length }
-        <div class="error">
-          <ErrorIndicator error={ expressionErrors[0] } />
-        </div>
-      {/if}
-    </h3>
+        {#if expressionErrors.length }
+          <div class="error">
+            <ErrorIndicator error={ expressionErrors[0] } />
+          </div>
+        {/if}
 
-    <div class="content" class:with-error={ expressionErrors.length }>
-      <TreeNode
-        node={ treeRoot }
-        selection={ treeSelection || codeSelection }
-        onSelect={ selectExpression } />
+        <button title="Hide syntax tree" class="btn btn-small btn-none collapse-btn" on:click={ () => showSyntaxTree = !showSyntaxTree }>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-text" viewBox="0 0 16 16">
+  <path d="M5 4a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5M5 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1z"/>
+  <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm10-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1"/>
+</svg>
+        </button>
+      </h3>
+
+      <div class="content" class:with-error={ expressionErrors[0] }>
+        <TreeNode
+          node={ treeRoot }
+          selection={ treeSelection || codeSelection }
+          onSelect={ selectExpression } />
+      </div>
     </div>
-  </div>
-
+  {/if}
 </div>
 
 <style>
@@ -430,6 +448,10 @@ return
     line-height: 2em;
   }
 
+  .legend .btn {
+    padding: .5rem;
+  }
+
   .content {
     font-size: 1.3em;
     font-family: monospace;
@@ -442,6 +464,16 @@ return
   .context-editor .content,
   .output .content {
     overflow: hidden;
+  }
+
+
+  .tree {
+    flex: 0.5;
+    min-width: 300px;
+  }
+
+  .collapse-btn {
+    margin-left: auto;
   }
 
   .tree .content {

@@ -1,5 +1,4 @@
 <script>
-  import { afterUpdate } from 'svelte';
 
   /**
    * @type { {
@@ -18,6 +17,9 @@
 
   $: selected = node === selection;
 
+  /**
+   * @type { HTMLElement }
+   */
   let el;
 
   function handleSelect(event) {
@@ -31,12 +33,6 @@
 
     onSelect(null);
   }
-
-  afterUpdate(() => {
-    if (selected) {
-      el.scrollIntoViewIfNeeded();
-    }
-  });
 </script>
 
 <div class="node" bind:this={ el } class:selected={ selected }>

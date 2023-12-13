@@ -119,6 +119,17 @@ FeelEditor.prototype.highlight = function(range) {
   highlightSelection(this._cm, range);
 };
 
+/**
+ * @param { { anchor: number, head?: number } } anchor
+ */
+FeelEditor.prototype.setSelection = function(selection) {
+  this._cm.dispatch({
+    selection
+  });
+
+  this._cm.focus();
+};
+
 FeelEditor.prototype.setDialect = function(dialect) {
   this._configureLanguage(dialect, this._context);
 };

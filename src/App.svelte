@@ -90,6 +90,15 @@ return
     typeof output !== 'undefined' && JSON.stringify(output, null, 2) || ''
   );
 
+  function selectError(error) {
+    if (error && error.position) {
+      codeEditor.setSelection({
+        anchor: error.position.from,
+        head: error.position.to
+      });
+    }
+  }
+
   function selectExpression(node) {
     treeSelection = node;
     codeSelection = null;
@@ -284,7 +293,7 @@ return
         <span class="spacer"></span>
 
         {#if syntaxError }
-          <ErrorIndicator error={ syntaxError } />
+          <ErrorIndicator error={ syntaxError } onClick={ () => selectError(syntaxError) } />
         {/if}
 
         {#if !showSyntaxTree}
@@ -348,7 +357,10 @@ return
           <span class="spacer"></span>
 
           {#if evalError || syntaxError }
-            <ErrorIndicator error={ evalError || syntaxError } />
+            <ErrorIndicator
+              error={ evalError || syntaxError }
+              onClick={ () => selectError(syntaxError) }
+            />
           {/if}
         </h3>
 
@@ -385,7 +397,10 @@ return
         <span class="spacer"></span>
 
         {#if syntaxError }
-          <ErrorIndicator error={ syntaxError } />
+          <ErrorIndicator
+            error={ syntaxError }
+            onClick={ () => selectError(syntaxError) }
+          />
         {/if}
 
         <button title="Hide syntax tree" class="btn btn-small btn-none collapse-btn" on:click={ () => showSyntaxTree = !showSyntaxTree }>

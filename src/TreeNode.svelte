@@ -37,7 +37,7 @@
 
 <div class="node" bind:this={ el } class:selected={ selected }>
 
-  <button class="description btn-none" on:mouseover={ handleSelect } on:mouseleave={ handleDeselect } on:focus={ handleSelect }>
+  <button class="description btn-none" on:mouseover={ handleSelect } on:mouseout={ handleDeselect } on:blur={ handleDeselect } on:focus={ handleSelect }>
     <span class:error={ node.error } class="name" title={ node.error && node.error.message || '' }>{ node.error ? 'ERROR' : node.name }</span>
     <span class="position">[{ node.from }, { node.to }]</span>
   </button>

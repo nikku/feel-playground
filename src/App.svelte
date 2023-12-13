@@ -230,7 +230,7 @@ return
     } catch (err) {
       contextError = err;
     }
-  }, 600);
+  }, 300);
 
   const evaluateExpression = debounce((dialect, expression, context) => {
 
@@ -249,7 +249,7 @@ return
 
       output = undefined;
     }
-  }, 600);
+  }, 300);
 
   function setDialect(codeEditor, dialect) {
     codeEditor && codeEditor.setDialect(dialect);

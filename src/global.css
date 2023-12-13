@@ -23,6 +23,8 @@ body, html {
   background: #EEE;
   border: 1px solid #EEE;
   border-radius: .5em;
+
+  cursor: pointer;
 }
 
 a.btn {

@@ -3,8 +3,7 @@
 [![CI](https://github.com/nikku/feel-playground/actions/workflows/CI.yml/badge.svg)](https://github.com/nikku/feel-playground/actions/workflows/CI.yml)
 
 An interactive app to learn the [DMN](https://www.omg.org/dmn/) FEEL language in your browser. 
-:arrow_right: [**Try it out**](https://nikku.github.io/feel-playground).
-
+➡️ [**Try it out**](https://nikku.github.io/feel-playground).
 
 [![FEEL playground screenshot](./docs/screenshot.png)](https://nikku.github.io/feel-playground)
 

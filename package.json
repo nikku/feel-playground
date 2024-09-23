@@ -17,7 +17,7 @@
     "@codemirror/search": "^6.5.5",
     "@codemirror/state": "^6.3.3",
     "@codemirror/view": "^6.22.2",
-    "@rollup/plugin-commonjs": "^26.0.0",
+    "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "eslint": "^8.55.0",

@@ -3,15 +3,30 @@ import {
   evaluate as evalExpression,
   parseExpression,
   parseUnaryTests
+  context
+} from 'feelin';
 } from 'feelin';
 
 const parsers = {
   expression: parseExpression,
   unaryTests: parseUnaryTests
+
+// Custom context function implementation
+function customContext(entries) {
+  const result = {};
+  for (const entry of entries) {
+    if (entry && typeof entry === 'object' && 'key' in entry && 'value' in entry) {
+      result[entry.key] = entry.value;
+    }
+  }
+  return result;
+}
+
 };
 
-const interpreters = {
+  context: customContext,
   expression: evalExpression,
+const interpreters = {
   unaryTests: evalUnaryTest
 };
 

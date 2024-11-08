@@ -1,10 +1,11 @@
 {
   "name": "feel-playground",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "all": "run-s lint build",
-    "build": "rollup -c --bundleConfigAsCjs",
-    "dev": "rollup -c -w --bundleConfigAsCjs",
+    "build": "rollup -c",
+    "dev": "npm run build -- -w",
     "start": "sirv public",
     "lint": "eslint ."
   },

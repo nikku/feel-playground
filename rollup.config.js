@@ -9,6 +9,8 @@ import css from 'rollup-plugin-css-only';
 import copy from 'rollup-plugin-copy';
 import opener from 'opener';
 
+import child_process from 'node:child_process';
+
 const production = !process.env.ROLLUP_WATCH;
 
 export default [
@@ -86,7 +88,7 @@ function serve() {
   return {
     writeBundle() {
       if (server) return;
-      server = require('child_process').spawn('npm', [ 'run', 'start', '--', '--dev' ], {
+      server = child_process.spawn('npm', [ 'run', 'start', '--', '--dev' ], {
         stdio: [ 'ignore', 'inherit', 'inherit' ],
         shell: true
       });

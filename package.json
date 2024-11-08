@@ -6,7 +6,7 @@
     "build": "rollup -c --bundleConfigAsCjs",
     "dev": "rollup -c -w --bundleConfigAsCjs",
     "start": "sirv public",
-    "lint": "eslint . --ext js,svelte"
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@codemirror/autocomplete": "^6.18.2",
@@ -20,9 +20,9 @@
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-node-resolve": "^15.3.0",
     "@rollup/plugin-terser": "^0.4.4",
-    "eslint": "^8.55.0",
-    "eslint-plugin-bpmn-io": "^1.0.0",
-    "eslint-plugin-svelte": "^2.35.1",
+    "eslint": "^9.14.0",
+    "eslint-plugin-bpmn-io": "^2.0.2",
+    "eslint-plugin-svelte": "^2.46.0",
     "feelin": "^3.0.1",
     "lang-feel": "^2.0.0",
     "lezer-feel": "^1.2.6",

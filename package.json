@@ -27,7 +27,7 @@
     "lang-feel": "^2.0.0",
     "lezer-feel": "^1.2.6",
     "min-dash": "^4.2.2",
-    "npm-run-all2": "^7.0.0",
+    "npm-run-all2": "^7.0.1",
     "opener": "^1.5.2",
     "rollup": "^4.24.4",
     "rollup-plugin-copy": "^3.5.0",

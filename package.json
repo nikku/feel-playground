@@ -19,7 +19,7 @@
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.34.2",
     "@rollup/plugin-commonjs": "^28.0.1",
-    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.4",
     "eslint": "^9.14.0",
     "eslint-plugin-bpmn-io": "^2.0.2",

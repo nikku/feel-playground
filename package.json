@@ -24,7 +24,7 @@
     "eslint": "^9.18.0",
     "eslint-plugin-bpmn-io": "^2.0.2",
     "eslint-plugin-svelte": "^2.46.1",
-    "feelin": "^3.2.0",
+    "feelin": "^4.0.0",
     "lang-feel": "^2.2.0",
     "lezer-feel": "^1.4.0",
     "min-dash": "^4.2.2",

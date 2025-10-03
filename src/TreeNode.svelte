@@ -44,7 +44,7 @@
 
   {#if node.children.length}
     <div class="children">
-      {#each node.children as child}
+      {#each node.children as child (child)}
         <svelte:self
           node={ child }
           onSelect={ onSelect }

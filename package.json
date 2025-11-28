@@ -10,14 +10,14 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "@codemirror/autocomplete": "^6.18.4",
-    "@codemirror/commands": "^6.9.0",
+    "@codemirror/autocomplete": "^6.20.0",
+    "@codemirror/commands": "^6.10.0",
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/language": "^6.10.8",
-    "@codemirror/lint": "^6.9.0",
+    "@codemirror/lint": "^6.9.2",
     "@codemirror/search": "^6.5.11",
     "@codemirror/state": "^6.5.2",
-    "@codemirror/view": "^6.38.4",
+    "@codemirror/view": "^6.38.8",
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "^0.4.4",

@@ -382,7 +382,7 @@ return
             <h4>Warnings ({ output.warnings.length })</h4>
 
             <ul>
-              {#each output.warnings as warning}
+              {#each output.warnings as warning (warning)}
               <li>{ warning.message }</li>
               {/each}
             </ul>

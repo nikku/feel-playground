@@ -80,14 +80,14 @@ return
     });
 
     outputViewer = new JsonEditor({
-      doc: typeof output === 'undefined' ? '' : output,
+      doc: typeof output?.value === 'undefined' ? '' : output.value,
       parent: outputElement,
       readOnly: true
     });
   });
 
   $: outputViewer && outputViewer.setDoc(
-    typeof output !== 'undefined' && JSON.stringify(output, null, 2) || ''
+    typeof output?.value !== 'undefined' && JSON.stringify(output.value, null, 2) || ''
   );
 
   function selectError(error) {

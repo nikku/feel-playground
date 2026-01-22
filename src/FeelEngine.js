@@ -20,7 +20,7 @@ export { SyntaxError } from 'feelin';
 /**
  * @param { string } type
  * @param { string } expression
- * @param { import('feelin').InterpreterContext } context
+ * @param { import('feelin').EvalContext } context
  *
  * @return { any }
  */

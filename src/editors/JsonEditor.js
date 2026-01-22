@@ -34,7 +34,7 @@ export default function JsonEditor({
       basicEditor,
       EditorState.readOnly.of(true),
       EditorView.editable.of(false),
-      EditorView.contentAttributes.of({ tabindex: "0" })
+      EditorView.contentAttributes.of({ tabindex: '0' })
     );
   } else {
     extensions.push(

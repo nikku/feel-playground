@@ -4,9 +4,11 @@ import { jsonLinter } from './Linting';
 import {
   createEditor,
   basicEditor,
-  basicViewer,
   onChangeHandler
 } from './BaseEditor';
+
+import { EditorView } from '@codemirror/view';
+import { EditorState } from '@codemirror/state';
 
 /**
  * @param { {
@@ -28,7 +30,12 @@ export default function JsonEditor({
   ];
 
   if (readOnly) {
-    extensions.push(basicViewer);
+    extensions.push(
+      basicEditor,
+      EditorState.readOnly.of(true),
+      EditorView.editable.of(false),
+      EditorView.contentAttributes.of({ tabindex: "0" })
+    );
   } else {
     extensions.push(
       jsonLinter,

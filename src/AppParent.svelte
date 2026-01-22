@@ -117,6 +117,11 @@
   main {
     --color-error-fg: #FEFEFE;
     --color-error-bg: #d11;
+    --color-error-border: #d11;
+
+    --color-warning-fg: #333;
+    --color-warning-bg: #f7b576;
+    --color-warning-border: #c7711e;
   }
 
   header {

@@ -11,7 +11,7 @@ import {
 } from 'lang-feel';
 
 import { highlightSelection } from './Highlight';
-import { feelLinter } from './Linting';
+import { feelLinter, feelWarningsLinter } from './Linting';
 
 import {
   createEditor,
@@ -61,10 +61,13 @@ export default function FeelEditor({
   onBlur
 }) {
 
+  const warnings = new Compartment();
+
   const language = new Compartment();
 
   const extensions = [
-    language.of(feelLanguage(dialect, context))
+    language.of(feelLanguage(dialect, context)),
+    warnings.of(feelWarningsLinter([]))
   ];
 
   if (onMousemove || onMouseout) {
@@ -101,6 +104,7 @@ export default function FeelEditor({
   });
 
   this._language = language;
+  this._warnings = warnings;
 
   this._dialect = dialect;
   this._context = context;
@@ -158,6 +162,15 @@ FeelEditor.prototype._configureLanguage = function(dialect, context) {
       to: doc.length,
       insert: doc
     }
+  });
+};
+
+FeelEditor.prototype.setWarnings = function(warnings) {
+
+  this._cm.dispatch({
+    effects: this._warnings.reconfigure(
+      feelWarningsLinter(warnings)
+    )
   });
 };
 

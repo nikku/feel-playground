@@ -5,6 +5,22 @@ import { linter } from '@codemirror/lint';
 
 export const jsonLinter = linter(jsonParseLinter());
 
+export const feelWarningsLinter = (warnings) => linter(view => {
+
+  /**
+   * @type { import('@codemirror/lint').Diagnostic[] }
+   */
+  const diagnostics = warnings.map(warning => ({
+    from: warning.position.from,
+    to: warning.position.to,
+    message: warning.message,
+    severity: 'warning'
+  }));
+
+  return diagnostics;
+});
+
+
 export const feelLinter = linter(view => {
 
   /**

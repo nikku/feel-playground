@@ -251,6 +251,10 @@ return
     }
   }, 300);
 
+  function setWarnings(codeEditor, warnings) {
+    codeEditor && codeEditor.setWarnings(warnings);
+  }
+
   function setDialect(codeEditor, dialect) {
     codeEditor && codeEditor.setDialect(dialect);
   }
@@ -258,6 +262,8 @@ return
   function setContext(codeEditor, context) {
     codeEditor && codeEditor.setContext(context);
   }
+
+  $: setWarnings(codeEditor, output?.warnings);
 
   $: setDialect(codeEditor, dialect);
 
@@ -334,7 +340,7 @@ return
 
         {#if contextError}
           <div class="note error-note">
-            { contextError.message }
+            <p>{ contextError.message }</p>
           </div>
         {/if}
 
@@ -344,7 +350,7 @@ return
 
         {#if dialect === 'unaryTests'}
           <div class="note">
-            Input <code class="qmark">?</code> is treated as value to test.
+            <p>Input <code class="qmark">?</code> is treated as value to test.</p>
           </div>
         {/if}
       </div>
@@ -367,17 +373,33 @@ return
         <div class="content"
              bind:this={ outputElement }
              class:with-error={ evalError || syntaxError }
+             class:with-warnings={ output?.warnings.length }
         ></div>
+
+        {#if output?.warnings.length}
+          <div class="note warning-note">
+
+            <h4>Warnings ({ output.warnings.length })</h4>
+
+            <ul>
+              {#each output.warnings as warning}
+              <li>{ warning.message }</li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
 
         {#if evalError}
           <div class="note error-note">
-            Failed to evaluate FEEL expression: { evalError.message }
+            <p>Failed to evaluate FEEL expression: { evalError.message }</p>
           </div>
         {/if}
 
         {#if syntaxError}
           <div class="note error-note">
-            Failed to parse FEEL expression: { syntaxError.message } {#if syntaxError.input}parsing &lt;{ syntaxError.input }&gt; {/if}at [{syntaxError.position.from}, {syntaxError.position.to}]
+            <p>
+              Failed to parse FEEL expression: { syntaxError.message } {#if syntaxError.input}parsing &lt;{ syntaxError.input }&gt; {/if}at [{syntaxError.position.from}, {syntaxError.position.to}]
+            </p>
           </div>
         {/if}
 
@@ -434,15 +456,36 @@ return
     font-weight: bold;
   }
 
-  .content.with-error {
+  .note p,
+  .note h4,
+  .note ul {
+    margin: .5em .75em;
+  }
+
+  .note ul {
+    padding-inline-start: 2em;
+  }
+
+  .content.with-error,
+  .content.with-warnings {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+    border-bottom: none;
+  }
+
+  .warning-note {
+    background: var(--color-warning-bg);
+    color: var(--color-warning-fg);
+    margin-top: 0;
+    border: solid 1px var(--color-warning-border);
+    border-radius: 0 0 3px 3px;
+    font-family: monospace;
   }
 
   .error-note {
     background: var(--color-error-bg);
     color: var(--color-error-fg);
-    padding: .5em .75em;
+    border: solid 1px var(--color-error-border);
     margin-top: 0;
     border-radius: 0 0 3px 3px;
     font-family: monospace;

@@ -23,7 +23,7 @@
     "@rollup/plugin-terser": "^1.0.0",
     "eslint": "^9.39.4",
     "eslint-plugin-bpmn-io": "^2.2.0",
-    "eslint-plugin-svelte": "^3.17.0",
+    "eslint-plugin-svelte": "^3.17.1",
     "feelin": "^7.0.0",
     "lang-feel": "^4.0.0",
     "lezer-feel": "^3.0.0",

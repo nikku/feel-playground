@@ -350,7 +350,7 @@ return
 
         {#if dialect === 'unaryTests'}
           <div class="note">
-            <p>Input <code class="qmark">?</code> is treated as value to test.</p>
+            Input <code class="qmark">?</code> is treated as value to test.
           </div>
         {/if}
       </div>

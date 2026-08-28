@@ -13,7 +13,7 @@
   } from './editors/Linting';
 
   import TreeNode from './TreeNode.svelte';
-  import ErrorIndicator from './ErrorIndicator.svelte';
+  import ProblemIndicator from './ProblemIndicator.svelte';
   import Problems from './Problems.svelte';
 
   import {
@@ -91,11 +91,11 @@ return
     typeof output?.value !== 'undefined' && JSON.stringify(output.value, null, 2) || ''
   );
 
-  function selectError(error) {
-    if (error && error.position) {
+  function selectError(problem) {
+    if (problem && problem.position) {
       codeEditor.setSelection({
-        anchor: error.position.from,
-        head: error.position.to
+        anchor: problem.position.from,
+        head: problem.position.to
       });
     }
   }
@@ -263,14 +263,17 @@ return
     return `FEEL parse error: ${ error.message } ${ input }${ position }`.trimEnd();
   }
 
-  $: warningMessages = (output?.warnings || []).map(warning => warning.message);
+  $: warnings = (output?.warnings || []).map(warning => ({
+    message: warning.message,
+    position: warning.position
+  }));
 
   $: outputErrors = [
-    ...(syntaxError ? [ formatSyntaxError(syntaxError) ] : []),
-    ...(evalError ? [ `FEEL evaluation error: ${ evalError.message }` ] : [])
+    ...(syntaxError ? [ { message: formatSyntaxError(syntaxError), position: syntaxError.position } ] : []),
+    ...(evalError ? [ { message: `FEEL evaluation error: ${ evalError.message }`, position: evalError.position } ] : [])
   ];
 
-  $: contextErrors = contextError ? [ contextError.message ] : [];
+  $: contextErrors = contextError ? [ { message: contextError.message } ] : [];
 
   function setDialect(codeEditor, dialect) {
     codeEditor && codeEditor.setDialect(dialect);
@@ -316,7 +319,7 @@ return
         <span class="spacer"></span>
 
         {#if syntaxError }
-          <ErrorIndicator error={ syntaxError } onClick={ () => selectError(syntaxError) } />
+          <ProblemIndicator severity="error" problem={ syntaxError } onClick={ selectError } />
         {/if}
 
         {#if !showSyntaxTree}
@@ -344,7 +347,7 @@ return
           <span class="spacer"></span>
 
           {#if contextError }
-            <ErrorIndicator error={ contextError } />
+            <ProblemIndicator severity="error" problem={ contextErrors[0] } />
           {/if}
 
         </h3>
@@ -356,7 +359,7 @@ return
         ></div>
 
         {#if contextError}
-          <Problems severity="error" label="Errors" messages={ contextErrors } />
+          <Problems severity="error" label="Errors" problems={ contextErrors } />
         {/if}
         <div class="note">
           Define your input variables as a JSON object literal.
@@ -376,11 +379,12 @@ return
 
           <span class="spacer"></span>
 
-          {#if evalError || syntaxError }
-            <ErrorIndicator
-              error={ evalError || syntaxError }
-              onClick={ () => selectError(syntaxError) }
-            />
+          {#if warnings.length }
+            <ProblemIndicator severity="warning" problem={ warnings[0] } onClick={ selectError } />
+          {/if}
+
+          {#if outputErrors.length }
+            <ProblemIndicator severity="error" problem={ outputErrors[0] } onClick={ selectError } />
           {/if}
         </h3>
 
@@ -390,9 +394,9 @@ return
              class:with-warnings={ output?.warnings.length }
         ></div>
 
-        <Problems severity="warning" label="Warnings" messages={ warningMessages } />
+        <Problems severity="warning" label="Warnings" problems={ warnings } onSelect={ selectError } />
 
-        <Problems severity="error" label="Errors" messages={ outputErrors } />
+        <Problems severity="error" label="Errors" problems={ outputErrors } onSelect={ selectError } />
 
         <div class="note">
           Re-computes once you change code or input.
@@ -410,9 +414,10 @@ return
         <span class="spacer"></span>
 
         {#if syntaxError }
-          <ErrorIndicator
-            error={ syntaxError }
-            onClick={ () => selectError(syntaxError) }
+          <ProblemIndicator
+            severity="error"
+            problem={ syntaxError }
+            onClick={ selectError }
           />
         {/if}
 

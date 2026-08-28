@@ -8,19 +8,39 @@
   export let label;
 
   /**
-   * @type { string[] }
+   * @type { { message: string, position?: { from: number, to: number } }[] }
    */
-  export let messages = [];
+  export let problems = [];
+
+  /**
+   * @type { ((problem: any) => void) | null }
+   */
+  export let onSelect = null;
+
+  function canSelect(problem) {
+    return onSelect && problem.position;
+  }
 </script>
 
-{#if messages.length}
+{#if problems.length}
   <div class="note { severity }-note">
 
-    <h4>{ label } ({ messages.length })</h4>
+    <h4>{ label } ({ problems.length })</h4>
 
     <ul>
-      {#each messages as message (message)}
-        <li>{ message }</li>
+      {#each problems as problem (problem.message)}
+        <li>
+          {#if canSelect(problem)}
+            <button
+              type="button"
+              class="problem-link"
+              title="Jump to { severity }"
+              on:click={ () => onSelect(problem) }
+            >{ problem.message }</button>
+          {:else}
+            { problem.message }
+          {/if}
+        </li>
       {/each}
     </ul>
   </div>
@@ -55,5 +75,16 @@
     color: var(--color-error-fg);
     border: solid 1px var(--color-error-border);
     border-radius: 0 0 3px 3px;
+  }
+
+  .problem-link {
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    text-decoration: none;
   }
 </style>

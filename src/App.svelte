@@ -14,6 +14,7 @@
 
   import TreeNode from './TreeNode.svelte';
   import ErrorIndicator from './ErrorIndicator.svelte';
+  import Problems from './Problems.svelte';
 
   import {
     debounce
@@ -255,6 +256,22 @@ return
     codeEditor && codeEditor.setWarnings(warnings);
   }
 
+  function formatSyntaxError(error) {
+    const input = error.input ? `parsing <${ error.input }> ` : '';
+    const position = error.position ? `at [${ error.position.from }, ${ error.position.to }]` : '';
+
+    return `FEEL parse error: ${ error.message } ${ input }${ position }`.trimEnd();
+  }
+
+  $: warningMessages = (output?.warnings || []).map(warning => warning.message);
+
+  $: outputErrors = [
+    ...(syntaxError ? [ formatSyntaxError(syntaxError) ] : []),
+    ...(evalError ? [ `FEEL evaluation error: ${ evalError.message }` ] : [])
+  ];
+
+  $: contextErrors = contextError ? [ contextError.message ] : [];
+
   function setDialect(codeEditor, dialect) {
     codeEditor && codeEditor.setDialect(dialect);
   }
@@ -339,11 +356,8 @@ return
         ></div>
 
         {#if contextError}
-          <div class="note error-note">
-            <p>{ contextError.message }</p>
-          </div>
+          <Problems severity="error" label="Errors" messages={ contextErrors } />
         {/if}
-
         <div class="note">
           Define your input variables as a JSON object literal.
         </div>
@@ -376,32 +390,9 @@ return
              class:with-warnings={ output?.warnings.length }
         ></div>
 
-        {#if output?.warnings.length}
-          <div class="note warning-note">
+        <Problems severity="warning" label="Warnings" messages={ warningMessages } />
 
-            <h4>Warnings ({ output.warnings.length })</h4>
-
-            <ul>
-              {#each output.warnings as warning (warning)}
-              <li>{ warning.message }</li>
-              {/each}
-            </ul>
-          </div>
-        {/if}
-
-        {#if evalError}
-          <div class="note error-note">
-            <p>Failed to evaluate FEEL expression: { evalError.message }</p>
-          </div>
-        {/if}
-
-        {#if syntaxError}
-          <div class="note error-note">
-            <p>
-              Failed to parse FEEL expression: { syntaxError.message } {#if syntaxError.input}parsing &lt;{ syntaxError.input }&gt; {/if}at [{syntaxError.position.from}, {syntaxError.position.to}]
-            </p>
-          </div>
-        {/if}
+        <Problems severity="error" label="Errors" messages={ outputErrors } />
 
         <div class="note">
           Re-computes once you change code or input.
@@ -456,39 +447,11 @@ return
     font-weight: bold;
   }
 
-  .note p,
-  .note h4,
-  .note ul {
-    margin: .5em .75em;
-  }
-
-  .note ul {
-    padding-inline-start: 2em;
-  }
-
   .content.with-error,
   .content.with-warnings {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     border-bottom: none;
-  }
-
-  .warning-note {
-    background: var(--color-warning-bg);
-    color: var(--color-warning-fg);
-    margin-top: 0;
-    border: solid 1px var(--color-warning-border);
-    border-radius: 0 0 3px 3px;
-    font-family: monospace;
-  }
-
-  .error-note {
-    background: var(--color-error-bg);
-    color: var(--color-error-fg);
-    border: solid 1px var(--color-error-border);
-    margin-top: 0;
-    border-radius: 0 0 3px 3px;
-    font-family: monospace;
   }
 
   .type-select {

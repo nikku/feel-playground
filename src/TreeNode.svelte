@@ -1,7 +1,8 @@
 <script>
+  import TreeNode from './TreeNode.svelte';
 
   /**
-   * @type { {
+   * @typedef { {
    *   name: string,
    *   from: number,
    *   to: number,
@@ -9,18 +10,17 @@
    *   children: Node[]
    * } } Node
    */
-  export let node;
-
-  export let onSelect;
-
-  export let selection;
-
-  $: selected = node === selection;
 
   /**
-   * @type { HTMLElement }
+   * @type { {
+   *   node: Node,
+   *   onSelect: (node: Node | null) => void,
+   *   selection: Node | null
+   * } }
    */
-  let el;
+  let { node, onSelect, selection } = $props();
+
+  const selected = $derived(node === selection);
 
   function handleSelect(event) {
     event.stopPropagation();
@@ -35,9 +35,9 @@
   }
 </script>
 
-<div class="node" bind:this={ el } class:selected={ selected }>
+<div class="node" class:selected={ selected }>
 
-  <button class="description btn-none" on:mouseover={ handleSelect } on:mouseout={ handleDeselect } on:blur={ handleDeselect } on:focus={ handleSelect }>
+  <button class="description btn-none" onmouseover={ handleSelect } onmouseout={ handleDeselect } onblur={ handleDeselect } onfocus={ handleSelect }>
     <span class:error={ node.error } class="name" title={ node.error && node.error.message || '' }>{ node.error ? 'ERROR' : node.name }</span>
     <span class="position">[{ node.from }, { node.to }]</span>
   </button>
@@ -45,7 +45,7 @@
   {#if node.children.length}
     <div class="children">
       {#each node.children as child (child)}
-        <svelte:self
+        <TreeNode
           node={ child }
           onSelect={ onSelect }
           selection={ selection }

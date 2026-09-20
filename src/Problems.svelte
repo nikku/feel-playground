@@ -1,21 +1,19 @@
 <script>
 
   /**
-   * @type { 'error' | 'warning' }
+   * @type { {
+   *   severity?: 'error' | 'warning',
+   *   label: string,
+   *   problems?: { message: string, position?: { from: number, to: number } }[],
+   *   onSelect?: ((problem: any) => void) | null
+   * } }
    */
-  export let severity = 'error';
-
-  export let label;
-
-  /**
-   * @type { { message: string, position?: { from: number, to: number } }[] }
-   */
-  export let problems = [];
-
-  /**
-   * @type { ((problem: any) => void) | null }
-   */
-  export let onSelect = null;
+  let {
+    severity = 'error',
+    label,
+    problems = [],
+    onSelect = null
+  } = $props();
 
   function canSelect(problem) {
     return onSelect && problem.position;
@@ -35,7 +33,7 @@
               type="button"
               class="problem-link"
               title="Jump to { severity }"
-              on:click={ () => onSelect(problem) }
+              onclick={ () => onSelect(problem) }
             >{ problem.message }</button>
           {:else}
             { problem.message }

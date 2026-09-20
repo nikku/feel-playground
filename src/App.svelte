@@ -22,47 +22,46 @@
 
   import { onMount } from 'svelte';
 
-  export let params;
-  export let onParamsChanged;
+  let { params, onParamsChanged } = $props();
 
-  let codeEditorElement;
-  let contextEditorElement;
-  let outputElement;
+  let codeEditorElement = $state();
+  let contextEditorElement = $state();
+  let outputElement = $state();
 
-  let codeEditor;
-  let _contextEditor;
-  let outputViewer;
+  let codeEditor = $state();
+  let _contextEditor = $state();
+  let outputViewer = $state();
 
-  let treeRoot = { name: 'Expression', from: 0, to: 0, children: [] };
+  let treeRoot = $state({ name: 'Expression', from: 0, to: 0, children: [] });
 
-  let editorSelection;
+  let editorSelection = $state();
 
-  let treeSelection;
-  let codeSelection;
+  let treeSelection = $state();
+  let codeSelection = $state();
 
-  let dialect = params.dialect || 'expression';
+  let dialect = $state(params.dialect || 'expression');
 
-  let expression = params.expression || `for
+  let expression = $state(params.expression || `for
   fruit in [ "apple", "bananas" ], vegetable in vegetables
 return
-  { ingredients: [ fruit, vegetable ] }`;
+  { ingredients: [ fruit, vegetable ] }`);
 
 
-  let showSyntaxTree = params.showSyntaxTree || false;
+  let showSyntaxTree = $state(params.showSyntaxTree || false);
 
-  let output = undefined;
+  let output = $state(undefined);
 
-  let evalError = null;
-  let syntaxError = null;
+  let evalError = $state(null);
+  let syntaxError = $state(null);
 
-  let context;
+  let context = $state();
 
-  let contextString = params.contextString || `{
+  let contextString = $state(params.contextString || `{
   "vegetables": [ "garlic", "tomato" ],
   "Mike's age": 35
-}`;
+}`);
 
-  let contextError;
+  let contextError = $state();
 
   onMount(() => {
     codeEditor = new FeelEditor({
@@ -87,9 +86,11 @@ return
     });
   });
 
-  $: outputViewer && outputViewer.setDoc(
-    typeof output?.value !== 'undefined' && JSON.stringify(output.value, null, 2) || ''
-  );
+  $effect(() => {
+    outputViewer && outputViewer.setDoc(
+      typeof output?.value !== 'undefined' && JSON.stringify(output.value, null, 2) || ''
+    );
+  });
 
   function selectError(problem) {
     if (problem && problem.position) {
@@ -263,17 +264,17 @@ return
     return `FEEL parse error: ${ error.message } ${ input }${ position }`.trimEnd();
   }
 
-  $: warnings = (output?.warnings || []).map(warning => ({
+  const warnings = $derived((output?.warnings || []).map(warning => ({
     message: warning.message,
     position: warning.position
-  }));
+  })));
 
-  $: outputErrors = [
+  const outputErrors = $derived([
     ...(syntaxError ? [ { message: formatSyntaxError(syntaxError), position: syntaxError.position } ] : []),
     ...(evalError ? [ { message: `FEEL evaluation error: ${ evalError.message }`, position: evalError.position } ] : [])
-  ];
+  ]);
 
-  $: contextErrors = contextError ? [ { message: contextError.message } ] : [];
+  const contextErrors = $derived(contextError ? [ { message: contextError.message } ] : []);
 
   function setDialect(codeEditor, dialect) {
     codeEditor && codeEditor.setDialect(dialect);
@@ -283,23 +284,23 @@ return
     codeEditor && codeEditor.setContext(context);
   }
 
-  $: setWarnings(codeEditor, output?.warnings);
+  $effect(() => setWarnings(codeEditor, output?.warnings));
 
-  $: setDialect(codeEditor, dialect);
+  $effect(() => setDialect(codeEditor, dialect));
 
-  $: setContext(codeEditor, context);
+  $effect(() => setContext(codeEditor, context));
 
-  $: parseContext(contextString);
+  $effect(() => parseContext(contextString));
 
-  $: updateStack(dialect, expression, context);
+  $effect(() => updateStack(dialect, expression, context));
 
-  $: evaluateExpression(dialect, expression, context);
+  $effect(() => evaluateExpression(dialect, expression, context));
 
-  $: computeCodeSelection(treeRoot, editorSelection);
+  $effect(() => computeCodeSelection(treeRoot, editorSelection));
 
-  $: renderSelection(codeEditor, treeSelection);
+  $effect(() => renderSelection(codeEditor, treeSelection));
 
-  $: onParamsChanged(expression, contextString, dialect, showSyntaxTree);
+  $effect(() => onParamsChanged(expression, contextString, dialect, showSyntaxTree));
 </script>
 
 
@@ -323,7 +324,7 @@ return
         {/if}
 
         {#if !showSyntaxTree}
-          <button title="Show syntax tree" class="btn btn-small btn-none collapse-btn" on:click={ () => showSyntaxTree = !showSyntaxTree }>
+          <button title="Show syntax tree" class="btn btn-small btn-none collapse-btn" onclick={ () => showSyntaxTree = !showSyntaxTree }>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-text-fill" viewBox="0 0 16 16">
   <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1m-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5M5 8h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1m0 2h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1"/>
 </svg>
@@ -421,7 +422,7 @@ return
           />
         {/if}
 
-        <button title="Hide syntax tree" class="btn btn-small btn-none collapse-btn" on:click={ () => showSyntaxTree = !showSyntaxTree }>
+        <button title="Hide syntax tree" class="btn btn-small btn-none collapse-btn" onclick={ () => showSyntaxTree = !showSyntaxTree }>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-text" viewBox="0 0 16 16">
   <path d="M5 4a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5M5 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1z"/>
   <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm10-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1"/>

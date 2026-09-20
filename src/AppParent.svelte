@@ -1,4 +1,6 @@
 <script>
+  import { SvelteURL } from 'svelte/reactivity';
+
   import App from './App.svelte';
 
   import {
@@ -11,7 +13,7 @@
   } from 'min-dash';
 
 
-  let params;
+  let params = $state();
 
   async function parseParams() {
 
@@ -32,7 +34,7 @@
       };
     }
 
-    const url = new URL(window.location.href);
+    const url = new SvelteURL(window.location.href);
 
     const [
       expression,
@@ -55,7 +57,7 @@
 
   const onParamsChanged = debounce(async (expression, contextString, dialect, showSyntaxTree) => {
 
-    const url = new URL(window.location.href);
+    const url = new SvelteURL(window.location.href);
 
     const [
       e,

@@ -78,6 +78,8 @@
   }
 
   .problem-link {
+    display: inline;
+    vertical-align: top;
     padding: 0;
     border: none;
     background: none;

@@ -44,7 +44,7 @@
 
   {#if node.children.length}
     <div class="children">
-      {#each node.children as child (child)}
+      {#each node.children as child, idx (child.from + ':' + child.to + ':' + idx)}
         <TreeNode
           node={ child }
           onSelect={ onSelect }

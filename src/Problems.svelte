@@ -26,7 +26,7 @@
     <h4>{ label } ({ problems.length })</h4>
 
     <ul>
-      {#each problems as problem (problem.message)}
+      {#each problems as problem, idx (problem.message + idx)}
         <li>
           {#if canSelect(problem)}
             <button

@@ -13,7 +13,7 @@ export const feelWarningsLinter = (warnings = []) => linter(view => {
   const diagnostics = (warnings || []).map(warning => ({
     from: warning.position.from,
     to: warning.position.to,
-    message: warning.message,
+    message: warning.displayMessage || warning.message,
     severity: 'warning'
   }));
 

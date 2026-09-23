@@ -264,10 +264,31 @@ return
     return `FEEL parse error: ${ error.message } ${ input }${ position }`.trimEnd();
   }
 
-  const warnings = $derived((output?.warnings || []).map(warning => ({
-    message: warning.message,
-    position: warning.position
-  })));
+  const warnings = $derived.by(() => {
+    const deduped = [];
+
+    for (const warning of output?.warnings || []) {
+      const existing = deduped.find(other =>
+        other.message === warning.message &&
+        other.position?.from === warning.position?.from &&
+        other.position?.to === warning.position?.to
+      );
+
+      if (existing) {
+        existing.count++;
+        existing.displayMessage = `${ existing.message } (×${ existing.count })`;
+      } else {
+        deduped.push({
+          message: warning.message,
+          displayMessage: warning.message,
+          position: warning.position,
+          count: 1
+        });
+      }
+    }
+
+    return deduped;
+  });
 
   const outputErrors = $derived([
     ...(syntaxError ? [ { message: formatSyntaxError(syntaxError), position: syntaxError.position } ] : []),
@@ -284,7 +305,7 @@ return
     codeEditor && codeEditor.setContext(context);
   }
 
-  $effect(() => setWarnings(codeEditor, output?.warnings));
+  $effect(() => setWarnings(codeEditor, warnings));
 
   $effect(() => setDialect(codeEditor, dialect));
 

@@ -34,9 +34,9 @@
               class="problem-link"
               title="Jump to { severity }"
               onclick={ () => onSelect(problem) }
-            >{ problem.message }</button>
+            >{ problem.displayMessage || problem.message }</button>
           {:else}
-            { problem.message }
+            { problem.displayMessage || problem.message }
           {/if}
         </li>
       {/each}
